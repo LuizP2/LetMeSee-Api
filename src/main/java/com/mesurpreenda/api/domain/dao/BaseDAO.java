@@ -10,7 +10,7 @@ import java.util.Random;
 @Component
 public abstract class BaseDAO<T> {
 
-    protected JpaRepository<T, Long> repository;
+    protected JpaRepository<T, String> repository;
 
     public List<T> findAll() {
         return repository.findAll();
