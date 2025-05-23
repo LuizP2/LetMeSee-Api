@@ -7,6 +7,7 @@ import com.mesurpreenda.api.data.repository.MovieRepository;
 import com.mesurpreenda.api.data.repository.SeriesRepository;
 import com.mesurpreenda.api.data.repository.UserRepository;
 import com.mesurpreenda.api.domain.dto.FavoritesDTO;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -64,15 +65,17 @@ public class ApiServices {
     }
 
 
-    public void addFavorite(String userId, String contentId, boolean isMovie) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        if (isMovie) {
-            Movie movie = movieRepo.findById(contentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie not found"));
-            user.getFavoriteMovies().add(movie);
-        } else {
-            Series series = seriesRepo.findById(contentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Series not found"));
-            user.getFavoriteSeries().add(series);
-        }
+    @Transactional
+    public void addFavorite(String userId, Movie movie) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Salvar o filme no banco de dados local
+        Movie savedMovie = movieRepo.save(movie);
+
+        // Adicionar aos favoritos
+        user.getFavoriteMovies().add(savedMovie);
+
         userRepo.save(user);
     }
 
