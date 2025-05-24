@@ -9,7 +9,6 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class TmdbService {
-
     private final WebClient webClient;
 
     @Value("${tmdb.api.key}")
@@ -46,6 +45,98 @@ public class TmdbService {
                         .path("/search/multi")
                         .queryParam("api_key", apiKey)
                         .queryParam("query", query)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+    public Mono<TmdbDTO> searchMovie(String query) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/search/movie")
+                        .queryParam("api_key", apiKey)
+                        .queryParam("query", query)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+    public Mono<TmdbDTO> searchSeries(String query) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/search/tv")
+                        .queryParam("api_key", apiKey)
+                        .queryParam("query", query)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+    public Mono<TmdbDTO> discoverMovie() {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/discover/movie")
+                        .queryParam("api_key", apiKey)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+    public Mono<TmdbDTO> discoverSeries() {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/discover/tv")
+                        .queryParam("api_key", apiKey)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+    public Mono<TmdbDTO> getTrendingDay() {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/trending/all/day")
+                        .queryParam("api_key", apiKey)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+    public Mono<TmdbDTO> getTrendingWeek() {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/trending/all/week")
+                        .queryParam("api_key", apiKey)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+    public Mono<TmdbDTO> getTrendingMoviesDay() {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/trending/movie/day")
+                        .queryParam("api_key", apiKey)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+    public Mono<TmdbDTO> getTrendingMoviesWeek() {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/trending/movie/week")
+                        .queryParam("api_key", apiKey)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+    public Mono<TmdbDTO> getTrendingSeriesDay() {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/trending/tv/day")
+                        .queryParam("api_key", apiKey)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+    public Mono<TmdbDTO> getTrendingSeriesWeek() {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/trending/tv/week")
+                        .queryParam("api_key", apiKey)
                         .build())
                 .retrieve()
                 .bodyToMono(TmdbDTO.class);
