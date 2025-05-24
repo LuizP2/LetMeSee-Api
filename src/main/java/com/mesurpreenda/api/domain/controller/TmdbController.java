@@ -29,7 +29,7 @@ public class TmdbController {
     public Mono<TmdbDTO> searchMovie(@RequestParam String query) {
         return tmdbService.searchMovie(query);
     }
-    @GetMapping("/search/tv")
+    @GetMapping("/search/series")
     public Mono<TmdbDTO> searchSeries(@RequestParam String query) {
         return tmdbService.searchSeries(query);
     }
@@ -37,7 +37,7 @@ public class TmdbController {
     public Mono<TmdbDTO> discoverMovie() {
         return tmdbService.discoverMovie();
     }
-    @GetMapping("/discover/tv")
+    @GetMapping("/discover/series")
     public Mono<TmdbDTO> discoverSeries() {
         return tmdbService.discoverSeries();
     }
@@ -45,7 +45,7 @@ public class TmdbController {
     public Mono<TmdbDTO> getTrendingMoviesDay() {
         return tmdbService.getTrendingMoviesDay();
     }
-    @GetMapping("/trending/tv/day")
+    @GetMapping("/trending/series/day")
     public Mono<TmdbDTO> getTrendingSeriesDay() {
         return tmdbService.getTrendingSeriesDay();
     }
@@ -53,7 +53,7 @@ public class TmdbController {
     public Mono<TmdbDTO> getTrendingMoviesWeek() {
         return tmdbService.getTrendingMoviesWeek();
     }
-    @GetMapping("/trending/tv/week")
+    @GetMapping("/trending/series/week")
     public Mono<TmdbDTO> getTrendingSeriesWeek() {
         return tmdbService.getTrendingSeriesWeek();
     }
@@ -64,5 +64,13 @@ public class TmdbController {
     @GetMapping("/trending/all/week")
     public Mono<TmdbDTO> getTrendingWeek() {
         return tmdbService.getTrendingWeek();
+    }
+    @GetMapping("/upcoming/movie")
+    public Mono<TmdbDTO> getUpcomingMovies() {
+        return tmdbService.getUpcomingMovies();
+    }
+    @GetMapping("/upcoming/series")
+    public Mono<TmdbDTO> getUpcomingSeries() {
+        return tmdbService.getUpcomingSeries();
     }
 }

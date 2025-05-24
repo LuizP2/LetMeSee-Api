@@ -141,4 +141,40 @@ public class TmdbService {
                 .retrieve()
                 .bodyToMono(TmdbDTO.class);
     }
+    public Mono<TmdbDTO> getTopRatedMovies(){
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/movie/top_rated")
+                        .queryParam("api_key", apiKey)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+    public Mono<TmdbDTO> getTopRatedSeries(){
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/tv/top_rated")
+                        .queryParam("api_key", apiKey)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+    public Mono<TmdbDTO> getUpcomingMovies(){
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/movie/upcoming")
+                        .queryParam("api_key", apiKey)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+    public Mono<TmdbDTO> getUpcomingSeries(){
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/tv/upcoming")
+                        .queryParam("api_key", apiKey)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
 }
