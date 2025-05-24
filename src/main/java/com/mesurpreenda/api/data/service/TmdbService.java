@@ -1,5 +1,6 @@
 package com.mesurpreenda.api.data.service;
 
+import com.mesurpreenda.api.domain.dto.TmdbDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,13 +21,22 @@ public class TmdbService {
                 .build();
     }
 
-    public Mono<Object> getMovieById(Long movieId) {
+    public Mono<TmdbDTO> getMovieById(Long movieId) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/movie/{movie_id}")
                         .queryParam("api_key", apiKey)
                         .build(movieId))
                 .retrieve()
-                .bodyToMono(Object.class); // Pode mapear para uma classe específica, se quiser
+                .bodyToMono(TmdbDTO.class);
+    }
+    public Mono<TmdbDTO> getSeriesById(Long seriesId) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/tv/{tv_id}")
+                        .queryParam("api_key", apiKey)
+                        .build(seriesId))
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
     }
 }

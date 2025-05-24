@@ -24,24 +24,6 @@ public class SearchController {
     @Autowired
     private SeriesDAO seriesDAO;
 
-    @GetMapping("/search")
-    public List<Object> search(@RequestParam String query) {
-        List<Object> results = new ArrayList<>();
-        results.addAll(movieDAO.search(query));
-        results.addAll(seriesDAO.search(query));
-        return results;
-    }
-
-    @GetMapping("/search/movies")
-    public List<Movie> searchMovies(@RequestParam String query) {
-        return movieDAO.search(query);
-    }
-
-    @GetMapping("/search/series")
-    public List<Series> searchSeries(@RequestParam String query) {
-        return seriesDAO.search(query);
-    }
-
     @GetMapping("/random")
     public ResponseEntity<Object> random() {
         Optional<Movie> randomMovie = movieDAO.findRandom();
