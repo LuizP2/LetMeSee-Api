@@ -73,4 +73,44 @@ public class TmdbController {
     public Mono<TmdbDTO> getUpcomingSeries() {
         return tmdbService.getUpcomingSeries();
     }
+    @GetMapping("/top-rated/movies")
+    public Mono<TmdbDTO> getTopRatedMovies() {
+        return tmdbService.getTopRatedMovies();
+    }
+    @GetMapping("/top-rated/series")
+    public Mono<TmdbDTO> getTopRatedSeries() {
+        return tmdbService.getTopRatedSeries();
+    }
+    @GetMapping("movie/details/{id}")
+    public Mono<TmdbDTO> getMovieDetails(@PathVariable Long id) {
+        return tmdbService.getMovieDetails(id);
+    }
+    @GetMapping("series/details/{id}")
+    public Mono<TmdbDTO> getSeriesDetails(@PathVariable Long id) {
+        return tmdbService.getSeriesDetails(id);
+    }
+    @GetMapping("movie/trailer/{id}")
+    public Mono<TmdbDTO> getTrailerByMovieId(@PathVariable Long id) {
+        return tmdbService.getTrailerByMovieId(id);
+    }
+    @GetMapping("series/trailer/{id}")
+    public Mono<TmdbDTO> getTrailerBySeriesId(@PathVariable Long id) {
+        return tmdbService.getTrailerBySeriesId(id);
+    }
+    @GetMapping("/movie/provider/{id}")
+    public Mono<TmdbDTO> getMovieProviderById(@PathVariable Long id) {
+        return tmdbService.getMovieProviders(id);
+    }
+    @GetMapping("/series/provider/{id}")
+    public Mono<TmdbDTO> getSeriesProviderById(@PathVariable Long id) {
+        return tmdbService.getSeriesProviders(id);
+    }
+    @GetMapping("/movie/recommendations/{id}")
+    public Mono<TmdbDTO> getMovieRecommendations(@PathVariable Long id) {
+        return tmdbService.getMovieRecommendations(id);
+    }
+    @GetMapping("/series/recommendations/{id}")
+    public Mono<TmdbDTO> getSeriesRecommendations(@PathVariable Long id) {
+        return tmdbService.getSeriesRecommendations(id);
+    }
 }

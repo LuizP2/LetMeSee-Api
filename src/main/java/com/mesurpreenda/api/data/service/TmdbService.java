@@ -20,161 +20,127 @@ public class TmdbService {
                 .build();
     }
 
-    public Mono<TmdbDTO> getMovieById(Long movieId) {
+    private Mono<TmdbDTO> get(String path, Object... uriVariables) {
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/movie/{movie_id}")
-                        .queryParam("api_key", apiKey)
-                        .build(movieId))
+                .uri(uriBuilder -> {
+                    var builder = uriBuilder
+                            .path(path)
+                            .queryParam("api_key", apiKey);
+                    return builder.build(uriVariables);
+                })
                 .retrieve()
                 .bodyToMono(TmdbDTO.class);
     }
 
+    private Mono<TmdbDTO> getWithQuery(String path, String query) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(path)
+                        .queryParam("api_key", apiKey)
+                        .queryParam("query", query)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+    private Mono<TmdbDTO> getWithId(String path, Long id) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(path)
+                        .queryParam("api_key", apiKey)
+                        .queryParam("id", id)
+                        .build())
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+
+    public Mono<TmdbDTO> getMovieById(Long movieId) {
+        return get("/movie/{movie_id}", movieId);
+    }
+
     public Mono<TmdbDTO> getSeriesById(Long seriesId) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/tv/{tv_id}")
-                        .queryParam("api_key", apiKey)
-                        .build(seriesId))
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+        return get("/tv/{tv_id}", seriesId);
     }
+
     public Mono<TmdbDTO> searchBoth(String query) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/search/multi")
-                        .queryParam("api_key", apiKey)
-                        .queryParam("query", query)
-                        .build())
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+        return getWithQuery("/search/multi", query);
     }
+
     public Mono<TmdbDTO> searchMovie(String query) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/search/movie")
-                        .queryParam("api_key", apiKey)
-                        .queryParam("query", query)
-                        .build())
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+        return getWithQuery("/search/movie", query);
     }
+
     public Mono<TmdbDTO> searchSeries(String query) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/search/tv")
-                        .queryParam("api_key", apiKey)
-                        .queryParam("query", query)
-                        .build())
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+        return getWithQuery("/search/tv", query);
     }
+
     public Mono<TmdbDTO> discoverMovie() {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/discover/movie")
-                        .queryParam("api_key", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+        return get("/discover/movie");
     }
+
     public Mono<TmdbDTO> discoverSeries() {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/discover/tv")
-                        .queryParam("api_key", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+        return get("/discover/tv");
     }
+
     public Mono<TmdbDTO> getTrendingDay() {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/trending/all/day")
-                        .queryParam("api_key", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+        return get("/trending/all/day");
     }
+
     public Mono<TmdbDTO> getTrendingWeek() {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/trending/all/week")
-                        .queryParam("api_key", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+        return get("/trending/all/week");
     }
+
     public Mono<TmdbDTO> getTrendingMoviesDay() {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/trending/movie/day")
-                        .queryParam("api_key", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+        return get("/trending/movie/day");
     }
+
     public Mono<TmdbDTO> getTrendingMoviesWeek() {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/trending/movie/week")
-                        .queryParam("api_key", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+        return get("/trending/movie/week");
     }
+
     public Mono<TmdbDTO> getTrendingSeriesDay() {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/trending/tv/day")
-                        .queryParam("api_key", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+        return get("/trending/tv/day");
     }
+
     public Mono<TmdbDTO> getTrendingSeriesWeek() {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/trending/tv/week")
-                        .queryParam("api_key", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+        return get("/trending/tv/week");
     }
+
     public Mono<TmdbDTO> getTopRatedMovies(){
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/movie/top_rated")
-                        .queryParam("api_key", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+        return get("/movie/top_rated");
     }
+
     public Mono<TmdbDTO> getTopRatedSeries(){
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/tv/top_rated")
-                        .queryParam("api_key", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+        return get("/tv/top_rated");
     }
+
     public Mono<TmdbDTO> getUpcomingMovies(){
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/movie/upcoming")
-                        .queryParam("api_key", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+        return get("/movie/upcoming");
     }
-    public Mono<TmdbDTO> getUpcomingSeries(){
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/tv/upcoming")
-                        .queryParam("api_key", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToMono(TmdbDTO.class);
+    public Mono<TmdbDTO> getUpcomingSeries() {
+        return get("/tv/upcoming");
+    }
+    public Mono<TmdbDTO> getTrailerByMovieId(Long movieId) {
+        return getWithId("/movie/{movie_id}/videos", movieId);
+    }
+    public Mono<TmdbDTO> getTrailerBySeriesId(Long seriesId) {
+        return getWithId("/tv/{tv_id}/videos", seriesId);
+    }
+    public Mono<TmdbDTO> getMovieDetails(Long movieId) {
+        return getWithId("/movie/{movie_id}", movieId);
+    }
+    public Mono<TmdbDTO> getSeriesDetails(Long seriesId) {
+        return getWithId("/tv/{tv_id}", seriesId);
+    }
+    public Mono<TmdbDTO> getMovieProviders(Long movieId) {
+        return getWithId("/movie/{movie_id}/watch/providers", movieId);
+    }
+    public Mono<TmdbDTO> getSeriesProviders(Long seriesId) {
+        return getWithId("/tv/{tv_id}/watch/providers", seriesId);
+    }
+    public Mono<TmdbDTO> getMovieRecommendations(Long movieId) {
+        return getWithId("/movie/{movie_id}/recommendations", movieId);
+    }
+    public Mono<TmdbDTO> getSeriesRecommendations(Long seriesId) {
+        return getWithId("/tv/{tv_id}/recommendations", seriesId);
     }
 }
