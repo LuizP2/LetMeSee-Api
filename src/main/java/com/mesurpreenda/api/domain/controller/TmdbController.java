@@ -21,4 +21,8 @@ public class TmdbController {
     public Mono<TmdbDTO> getSeriesById(@PathVariable Long id) {
         return tmdbService.getSeriesById(id);
     }
+    @GetMapping("/search")
+    public Mono<TmdbDTO> searchBoth(@RequestParam String query) {
+        return tmdbService.searchBoth(query);
+    }
 }

@@ -30,12 +30,23 @@ public class TmdbService {
                 .retrieve()
                 .bodyToMono(TmdbDTO.class);
     }
+
     public Mono<TmdbDTO> getSeriesById(Long seriesId) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/tv/{tv_id}")
                         .queryParam("api_key", apiKey)
                         .build(seriesId))
+                .retrieve()
+                .bodyToMono(TmdbDTO.class);
+    }
+    public Mono<TmdbDTO> searchBoth(String query) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/search/multi")
+                        .queryParam("api_key", apiKey)
+                        .queryParam("query", query)
+                        .build())
                 .retrieve()
                 .bodyToMono(TmdbDTO.class);
     }
