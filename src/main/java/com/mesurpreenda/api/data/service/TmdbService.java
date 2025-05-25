@@ -1,7 +1,9 @@
 package com.mesurpreenda.api.data.service;
 
-import com.mesurpreenda.api.domain.dto.TmdbDTO;
+import com.mesurpreenda.api.domain.dto.TmdbResponseDTO;
+import com.mesurpreenda.api.domain.dto.TmdbResultDTO;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -20,127 +22,180 @@ public class TmdbService {
                 .build();
     }
 
-    private Mono<TmdbDTO> get(String path, Object... uriVariables) {
+    private <T> Mono<T> get(String path,
+                            ParameterizedTypeReference<T> typeRef,
+                            Object... uriVariables) {
         return webClient.get()
-                .uri(uriBuilder -> {
-                    var builder = uriBuilder
-                            .path(path)
-                            .queryParam("api_key", apiKey);
-                    return builder.build(uriVariables);
-                })
+                .uri(uriBuilder -> uriBuilder
+                        .path(path)
+                        .queryParam("api_key", apiKey)
+                        .queryParam("language", "pt-BR")
+                        .build(uriVariables))
                 .retrieve()
-                .bodyToMono(TmdbDTO.class);
+                .bodyToMono(typeRef);
     }
 
-    private Mono<TmdbDTO> getWithQuery(String path, String query) {
+    private <T> Mono<T> getWithQuery(String path,
+                            String query,
+                            ParameterizedTypeReference<T> typeRef,
+                            Object... uriVariables) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(path)
                         .queryParam("api_key", apiKey)
                         .queryParam("query", query)
-                        .build())
+                        .queryParam("language", "pt-BR")
+                        .build(uriVariables))
                 .retrieve()
-                .bodyToMono(TmdbDTO.class);
+                .bodyToMono(typeRef);
     }
-    private Mono<TmdbDTO> getWithId(String path, Long id) {
+    private Mono<TmdbResultDTO> getWithId(String path, Long id) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(path)
                         .queryParam("api_key", apiKey)
                         .queryParam("id", id)
+                        .queryParam("language", "pt-BR")
                         .build())
                 .retrieve()
-                .bodyToMono(TmdbDTO.class);
+                .bodyToMono(TmdbResultDTO.class);
     }
 
-    public Mono<TmdbDTO> getMovieById(Long movieId) {
-        return get("/movie/{movie_id}", movieId);
-    }
-
-    public Mono<TmdbDTO> getSeriesById(Long seriesId) {
-        return get("/tv/{tv_id}", seriesId);
-    }
-
-    public Mono<TmdbDTO> searchBoth(String query) {
-        return getWithQuery("/search/multi", query);
-    }
-
-    public Mono<TmdbDTO> searchMovie(String query) {
-        return getWithQuery("/search/movie", query);
-    }
-
-    public Mono<TmdbDTO> searchSeries(String query) {
-        return getWithQuery("/search/tv", query);
-    }
-
-    public Mono<TmdbDTO> discoverMovie() {
-        return get("/discover/movie");
-    }
-
-    public Mono<TmdbDTO> discoverSeries() {
-        return get("/discover/tv");
-    }
-
-    public Mono<TmdbDTO> getTrendingDay() {
-        return get("/trending/all/day");
-    }
-
-    public Mono<TmdbDTO> getTrendingWeek() {
-        return get("/trending/all/week");
-    }
-
-    public Mono<TmdbDTO> getTrendingMoviesDay() {
-        return get("/trending/movie/day");
-    }
-
-    public Mono<TmdbDTO> getTrendingMoviesWeek() {
-        return get("/trending/movie/week");
-    }
-
-    public Mono<TmdbDTO> getTrendingSeriesDay() {
-        return get("/trending/tv/day");
-    }
-
-    public Mono<TmdbDTO> getTrendingSeriesWeek() {
-        return get("/trending/tv/week");
-    }
-
-    public Mono<TmdbDTO> getTopRatedMovies(){
-        return get("/movie/top_rated");
-    }
-
-    public Mono<TmdbDTO> getTopRatedSeries(){
-        return get("/tv/top_rated");
-    }
-
-    public Mono<TmdbDTO> getUpcomingMovies(){
-        return get("/movie/upcoming");
-    }
-    public Mono<TmdbDTO> getUpcomingSeries() {
-        return get("/tv/upcoming");
-    }
-    public Mono<TmdbDTO> getTrailerByMovieId(Long movieId) {
-        return getWithId("/movie/{movie_id}/videos", movieId);
-    }
-    public Mono<TmdbDTO> getTrailerBySeriesId(Long seriesId) {
-        return getWithId("/tv/{tv_id}/videos", seriesId);
-    }
-    public Mono<TmdbDTO> getMovieDetails(Long movieId) {
+    public Mono<TmdbResultDTO> getMovieById(Long movieId) {
         return getWithId("/movie/{movie_id}", movieId);
     }
-    public Mono<TmdbDTO> getSeriesDetails(Long seriesId) {
+
+    public Mono<TmdbResultDTO> getSeriesById(Long seriesId) {
         return getWithId("/tv/{tv_id}", seriesId);
     }
-    public Mono<TmdbDTO> getMovieProviders(Long movieId) {
+    public Mono<TmdbResponseDTO<TmdbResultDTO>> searchBoth(String query) {
+        return getWithQuery(
+                "/search/multi",
+                query,
+                new ParameterizedTypeReference< TmdbResponseDTO<TmdbResultDTO> >() {}
+        );
+    }
+    public Mono<TmdbResponseDTO<TmdbResultDTO>> searchMovie(String query) {
+        return getWithQuery(
+                "/search/movie",
+                query,
+                new ParameterizedTypeReference< TmdbResponseDTO<TmdbResultDTO> >() {}
+        );
+    }
+
+    public Mono<TmdbResponseDTO<TmdbResultDTO>> searchSeries(String query) {
+        return getWithQuery(
+                "/search/tv",
+                query,
+                new ParameterizedTypeReference< TmdbResponseDTO<TmdbResultDTO> >() {}
+        );
+    }
+
+    public Mono<TmdbResponseDTO<TmdbResultDTO>> discoverMovie() {
+        return get(
+                "/discover/movie",
+                new ParameterizedTypeReference< TmdbResponseDTO<TmdbResultDTO> >() {}
+        );
+    }
+
+    public Mono<TmdbResponseDTO<TmdbResultDTO>> discoverSeries() {
+        return get(
+                "/discover/tv",
+                new ParameterizedTypeReference< TmdbResponseDTO<TmdbResultDTO> >() {}
+        );
+    }
+
+    public Mono<TmdbResponseDTO<TmdbResultDTO>> getTrendingDay() {
+        return get(
+                "/trending/all/day",
+                new ParameterizedTypeReference< TmdbResponseDTO<TmdbResultDTO> >() {}
+        );
+    }
+
+    public Mono<TmdbResponseDTO<TmdbResultDTO>> getTrendingWeek() {
+        return get(
+                "/trending/all/week",
+                new ParameterizedTypeReference< TmdbResponseDTO<TmdbResultDTO> >() {}
+        );
+    }
+
+    public Mono<TmdbResponseDTO<TmdbResultDTO>> getTrendingMoviesDay() {
+        return get(
+                "/trending/movie/day",
+                new ParameterizedTypeReference< TmdbResponseDTO<TmdbResultDTO> >() {}
+        );
+    }
+
+    public Mono<TmdbResponseDTO<TmdbResultDTO>> getTrendingMoviesWeek() {
+        return get(
+                "/trending/movie/week",
+                new ParameterizedTypeReference< TmdbResponseDTO<TmdbResultDTO> >() {}
+        );
+    }
+
+    public Mono<TmdbResponseDTO<TmdbResultDTO>> getTrendingSeriesDay() {
+        return get(
+                "/trending/tv/day",
+                new ParameterizedTypeReference< TmdbResponseDTO<TmdbResultDTO> >() {}
+        );
+    }
+
+    public Mono<TmdbResponseDTO<TmdbResultDTO>> getTrendingSeriesWeek() {
+        return get(
+                "/trending/tv/week",
+                new ParameterizedTypeReference< TmdbResponseDTO<TmdbResultDTO> >() {}
+        );
+    }
+
+    public Mono<TmdbResponseDTO<TmdbResultDTO>> getTopRatedMovies() {
+        return get(
+                "/movie/top_rated",
+                new ParameterizedTypeReference<TmdbResponseDTO<TmdbResultDTO>>() {}
+        );
+    }
+
+    public Mono<TmdbResponseDTO<TmdbResultDTO>> getTopRatedSeries() {
+        return get(
+                "/tv/top_rated",
+                new ParameterizedTypeReference< TmdbResponseDTO<TmdbResultDTO> >() {}
+        );
+    }
+    public Mono<TmdbResponseDTO<TmdbResultDTO>> getUpcomingMovies() {
+        return get(
+                "/movie/upcoming",
+                new ParameterizedTypeReference< TmdbResponseDTO<TmdbResultDTO> >() {}
+        );
+    }
+
+    public Mono<TmdbResponseDTO<TmdbResultDTO>> getUpcomingSeries() {
+        return get(
+                "/tv/upcoming",
+                new ParameterizedTypeReference< TmdbResponseDTO<TmdbResultDTO> >() {}
+        );
+    }
+
+    public Mono<TmdbResultDTO> getTrailerByMovieId(Long movieId) {
+        return getWithId("/movie/{movie_id}/videos", movieId);
+    }
+    public Mono<TmdbResultDTO> getTrailerBySeriesId(Long seriesId) {
+        return getWithId("/tv/{tv_id}/videos", seriesId);
+    }
+    public Mono<TmdbResultDTO> getMovieDetails(Long movieId) {
+        return getWithId("/movie/{movie_id}", movieId);
+    }
+    public Mono<TmdbResultDTO> getSeriesDetails(Long seriesId) {
+        return getWithId("/tv/{tv_id}", seriesId);
+    }
+    public Mono<TmdbResultDTO> getMovieProviders(Long movieId) {
         return getWithId("/movie/{movie_id}/watch/providers", movieId);
     }
-    public Mono<TmdbDTO> getSeriesProviders(Long seriesId) {
+    public Mono<TmdbResultDTO> getSeriesProviders(Long seriesId) {
         return getWithId("/tv/{tv_id}/watch/providers", seriesId);
     }
-    public Mono<TmdbDTO> getMovieRecommendations(Long movieId) {
+    public Mono<TmdbResultDTO> getMovieRecommendations(Long movieId) {
         return getWithId("/movie/{movie_id}/recommendations", movieId);
     }
-    public Mono<TmdbDTO> getSeriesRecommendations(Long seriesId) {
+    public Mono<TmdbResultDTO> getSeriesRecommendations(Long seriesId) {
         return getWithId("/tv/{tv_id}/recommendations", seriesId);
     }
 }

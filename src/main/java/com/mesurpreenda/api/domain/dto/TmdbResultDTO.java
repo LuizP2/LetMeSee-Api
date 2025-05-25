@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Data
-public class TmdbDTO {
+public class TmdbResultDTO {
     private String backdrop_path;
     private List<Integer> genre_ids;
     private Long id;
