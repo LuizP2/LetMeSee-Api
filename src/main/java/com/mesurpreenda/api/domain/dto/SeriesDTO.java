@@ -7,9 +7,9 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class MovieDTO {
+public class SeriesDTO {
     private Long id;     // Pode ser nulo se quiser que o banco gere o ID.
     private String title;
     private String genre;
-    private int year;
+    private Integer seasons;
 }
