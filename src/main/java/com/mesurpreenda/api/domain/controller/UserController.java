@@ -15,13 +15,11 @@ public class UserController {
     @Autowired
     private ApiServices userService;
 
-    // GET /api/users
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    // GET /api/users/{id}
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable String id) {
         return userService.getUserById(id)
@@ -29,13 +27,11 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // POST /api/users
     @PostMapping
     public User createUser(@RequestBody User user) {
         return userService.createUser(user);
     }
 
-    // PUT /api/users/{id}
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody User userDetails) {
         return userService.updateUser(id, userDetails)
@@ -43,7 +39,6 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE /api/users/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable String id) {
         boolean deleted = userService.deleteUser(id);

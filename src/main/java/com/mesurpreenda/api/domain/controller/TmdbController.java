@@ -64,7 +64,7 @@ public class TmdbController {
     public Mono<TmdbResponseDTO<TmdbResultDTO>> getTrendingWeek() {
         return tmdbService.getTrendingWeek();
     }
-    @GetMapping("/upcoming/movie")
+    @GetMapping("/upcoming/movies")
     public Mono<TmdbResponseDTO<TmdbResultDTO>> getUpcomingMovies() {
         return tmdbService.getUpcomingMovies();
     }
