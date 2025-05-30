@@ -1,6 +1,7 @@
 package com.mesurpreenda.api.data.service;
 
 import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,36 +11,42 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class FavoritesEndpointsTest{
+class FavoritesEndpointsTest {
     @Autowired
     private WebTestClient webTestClient;
 
     @Test
+    @Order(2)
     void shouldGetFavoritesByUserId() {
-        webTestClient.get().uri("/api/favorite/{id}", "u0000003-0000-0000-0000-000000000003")
+        webTestClient.get().uri("/api/favorite/{id}", "12c874c8-bd79-4171-880f-eae16baf9428")
                 .exchange()
                 .expectStatus().isOk();
     }
 
     @Test
+    @Order(3)
     void shouldRemoveFavoriteForUser() {
         webTestClient.delete().uri(uriBuilder -> uriBuilder
                         .path("/api/favorite/{id}")
-                        .queryParam("contentId", "11111111-1111-1111-1111-111111111111")
+                        .queryParam("contentId", "550")
                         .queryParam("isMovie", true)
-                        .build("u0000002-0000-0000-0000-000000000002"))
+                        .build("12c874c8-bd79-4171-880f-eae16baf9428"))
                 .exchange()
                 .expectStatus().isOk();
     }
+
     @Test
+    @Order(1)
     void shouldAddFavoriteForUser() {
-        webTestClient.post().uri("/api/favorite/{id}", "u0000003-0000-0000-0000-000000000003")
+        webTestClient.post().uri(uriBuilder -> uriBuilder
+                        .path("/api/favorite/{id}")
+                        .queryParam("isMovie", true)
+                        .build("12c874c8-bd79-4171-880f-eae16baf9428"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "id": "11111111-1111-1111-1111-111111111222",
-                            "title": "Test Movie",
-                            "description": "Test Description"
+                            "id": "550",
+                            "title": "Test Movie"
                         }
                         """)
                 .exchange()

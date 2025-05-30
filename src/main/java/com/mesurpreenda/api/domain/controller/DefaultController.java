@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/")
 public class DefaultController {
     @GetMapping("/")
-    public String index(){
+    public String index() {
         return "Api rodando";
     }
 }

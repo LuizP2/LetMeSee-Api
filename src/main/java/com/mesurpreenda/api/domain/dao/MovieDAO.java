@@ -19,7 +19,8 @@ public class MovieDAO extends BaseDAO<Movie> {
     public List<Movie> search(String title) {
         return ((MovieRepository) repository).findByTitleContainingIgnoreCase(title);
     }
-    public Optional<Movie> findRandom(){
+
+    public Optional<Movie> findRandom() {
         return RandomSelector.getRandom(repository.findAll());
     }
 }

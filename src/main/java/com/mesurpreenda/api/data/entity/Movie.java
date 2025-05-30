@@ -1,9 +1,11 @@
 package com.mesurpreenda.api.data.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 
 @Table(name = "movie")
 @Getter
@@ -11,10 +13,8 @@ import org.hibernate.annotations.GenericGenerator;
 @Entity
 public class Movie {
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", updatable = false, nullable = false)
-    private String id;
+    private Long id;
     private String title;
     private String genre;
     private int year;

@@ -19,7 +19,8 @@ public class SeriesDAO extends BaseDAO<Series> {
     public List<Series> search(String title) {
         return ((SeriesRepository) repository).findByTitleContainingIgnoreCase(title);
     }
-    public Optional<Series> findRandom(){
+
+    public Optional<Series> findRandom() {
         return RandomSelector.getRandom(repository.findAll());
     }
 }

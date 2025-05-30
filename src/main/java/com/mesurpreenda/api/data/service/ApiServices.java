@@ -1,7 +1,6 @@
 package com.mesurpreenda.api.data.service;
 
 import com.mesurpreenda.api.data.entity.Movie;
-import com.mesurpreenda.api.data.entity.Series;
 import com.mesurpreenda.api.data.entity.User;
 import com.mesurpreenda.api.data.repository.MovieRepository;
 import com.mesurpreenda.api.data.repository.SeriesRepository;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -24,22 +24,18 @@ public class ApiServices {
     @Autowired
     private SeriesRepository seriesRepo;
 
-    // Lista todos os usuários
     public List<User> getAllUsers() {
         return userRepo.findAll();
     }
 
-    // Busca usuário por ID
     public Optional<User> getUserById(String id) {
         return userRepo.findById(id);
     }
 
-    // Cria novo usuário
     public User createUser(User user) {
         return userRepo.save(user);
     }
 
-    // Atualiza usuário existente
     public Optional<User> updateUser(String id, User userDetails) {
         return userRepo.findById(id).map(user -> {
             user.setName(userDetails.getName());
@@ -49,7 +45,6 @@ public class ApiServices {
         });
     }
 
-    // Deleta usuário
     public boolean deleteUser(String id) {
         return userRepo.findById(id).map(user -> {
             userRepo.delete(user);
@@ -70,16 +65,14 @@ public class ApiServices {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        // Salvar o filme no banco de dados local
         Movie savedMovie = movieRepo.save(movie);
 
-        // Adicionar aos favoritos
         user.getFavoriteMovies().add(savedMovie);
 
         userRepo.save(user);
     }
 
-    public void removeFavorite(String userId, String contentId, boolean isMovie) {
+    public void removeFavorite(String userId, Long contentId, boolean isMovie) {
         User user = userRepo.findById(userId).orElseThrow();
         if (isMovie) {
             user.getFavoriteMovies().removeIf(m -> m.getId().equals(contentId));

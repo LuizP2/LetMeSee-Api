@@ -19,6 +19,7 @@ public class TmdbService {
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
     }
+
     public TmdbService(WebClient.Builder builder) {
         this.webClient = builder.baseUrl("https://api.themoviedb.org/3").build();
     }
@@ -176,6 +177,7 @@ public class TmdbService {
                 }
         );
     }
+
     public Mono<TmdbResponseDTO<TmdbResultDTO>> getUpcomingMovies() {
         return get(
                 "/movie/upcoming",

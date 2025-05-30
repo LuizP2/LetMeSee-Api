@@ -18,14 +18,14 @@ public class FavoriteController {
         return userService.getFavorites(id);
     }
 
-    @PostMapping()
+    @PostMapping("/{id}")
     public ResponseEntity<String> addFavorite(@PathVariable String id, @RequestBody Movie movie) {
         userService.addFavorite(id, movie);
         return ResponseEntity.ok("Added to favorites");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> removeFavorite(@PathVariable String id, @RequestParam String contentId, @RequestParam boolean isMovie) {
+    public ResponseEntity<String> removeFavorite(@PathVariable String id, @RequestParam Long contentId, @RequestParam boolean isMovie) {
         userService.removeFavorite(id, contentId, isMovie);
         return ResponseEntity.ok("Removed from favorites");
     }

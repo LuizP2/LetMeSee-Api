@@ -3,9 +3,11 @@ package com.mesurpreenda.api.domain.controller;
 import com.mesurpreenda.api.data.entity.User;
 import com.mesurpreenda.api.data.service.ApiServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -28,8 +30,11 @@ public class UserController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+        User createdUser = userService.createUser(user);
+        URI location = URI.create("/api/users/" + createdUser.getId());
+        return ResponseEntity.created(location).body(createdUser).getBody();
     }
 
     @PutMapping("/{id}")

@@ -19,6 +19,7 @@ public class TmdbResponseMapper {
         movie.setYear(dto.getYear());
         return movie;
     }
+
     public MovieDTO toMovieDTO(Movie movie) {
         MovieDTO dto = new MovieDTO();
         dto.setId(Long.valueOf(movie.getId()));
@@ -27,6 +28,7 @@ public class TmdbResponseMapper {
         dto.setYear(movie.getYear());
         return dto;
     }
+
     public Series toSeriesEntity(SeriesDTO dto) {
         Series series = new Series();
         series.setTitle(dto.getTitle());
@@ -34,6 +36,7 @@ public class TmdbResponseMapper {
         series.setSeasons(dto.getSeasons());
         return series;
     }
+
     public SeriesDTO toSeriesDTO(Series series) {
         SeriesDTO dto = new SeriesDTO();
         dto.setId(Long.valueOf(series.getId()));
