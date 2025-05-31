@@ -84,11 +84,6 @@ public class TmdbController {
         return tmdbService.getUpcomingMovies();
     }
 
-    @GetMapping("/upcoming/series")
-    public Mono<TmdbResponseDTO<TmdbResultDTO>> getUpcomingSeries() {
-        return tmdbService.getUpcomingSeries();
-    }
-
     @GetMapping("/top-rated/movies")
     public Mono<TmdbResponseDTO<TmdbResultDTO>> getTopRatedMovies() {
         return tmdbService.getTopRatedMovies();

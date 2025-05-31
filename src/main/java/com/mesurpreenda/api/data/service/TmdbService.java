@@ -2,6 +2,7 @@ package com.mesurpreenda.api.data.service;
 
 import com.mesurpreenda.api.domain.dto.TmdbResponseDTO;
 import com.mesurpreenda.api.domain.dto.TmdbResultDTO;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -13,12 +14,9 @@ import reactor.core.publisher.Mono;
 public class TmdbService {
     private final WebClient webClient;
 
+    @Setter
     @Value("${tmdb.api.key}")
     private String apiKey;
-
-    public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
-    }
 
     public TmdbService(WebClient.Builder builder) {
         this.webClient = builder.baseUrl("https://api.themoviedb.org/3").build();
@@ -61,6 +59,20 @@ public class TmdbService {
                         .build(id))
                 .retrieve()
                 .bodyToMono(TmdbResultDTO.class);
+    }
+
+    private <T> Mono<T> getWithBearerToken(String path,
+                                     ParameterizedTypeReference<T> typeRef,
+                                     Object... uriVariables) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(path)
+                        .queryParam("api_key", apiKey)
+                        .queryParam("language", "pt-BR")
+                        .queryParam("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2YjBmNDA2NGYzODVmN2JlMTFkOGNjODU4YjEyODQ3OCIsIm5iZiI6MTc0ODAyNDE1Ni41NjQsInN1YiI6IjY4MzBiYjVjMWY0MWJlNThiOWI2YTk0ZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.kXV_fQB4yhveL21yjx5T5vvNwZVaijWHkxk_XqGXdl4")
+                        .build(uriVariables))
+                .retrieve()
+                .bodyToMono(typeRef);
     }
 
     public Mono<TmdbResultDTO> getMovieById(Long movieId) {
@@ -179,19 +191,10 @@ public class TmdbService {
     }
 
     public Mono<TmdbResponseDTO<TmdbResultDTO>> getUpcomingMovies() {
-        return get(
+        return getWithBearerToken(
                 "/movie/upcoming",
                 new ParameterizedTypeReference<TmdbResponseDTO<TmdbResultDTO>>() {
-                }
-        );
-    }
-
-    public Mono<TmdbResponseDTO<TmdbResultDTO>> getUpcomingSeries() {
-        return get(
-                "/tv/upcoming",
-                new ParameterizedTypeReference<TmdbResponseDTO<TmdbResultDTO>>() {
-                }
-        );
+                });
     }
 
     public Mono<TmdbResultDTO> getTrailerByMovieId(Long movieId) {

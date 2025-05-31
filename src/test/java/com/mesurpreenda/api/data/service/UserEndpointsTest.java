@@ -1,10 +1,7 @@
 package com.mesurpreenda.api.data.service;
 
 
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -12,10 +9,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserEndpointsTest {
 
     @Autowired
     private WebTestClient webTestClient;
+
+    private static String userId;
 
 
     @Test
@@ -38,13 +38,17 @@ class UserEndpointsTest {
                         }
                         """)
                 .exchange()
-                .expectStatus().isCreated();
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.id").value(id -> {
+                    userId = id.toString();
+                });
     }
 
     @Test
     @Order(3)
     void shouldGetUserById() {
-        webTestClient.get().uri("/api/users/{id}", "77b774ad-b4ce-423d-bde1-f684c3e0ca97")
+        webTestClient.get().uri("/api/users/{id}", userId)
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -52,7 +56,7 @@ class UserEndpointsTest {
     @Test
     @Order(4)
     void shouldUpdateUser() {
-        webTestClient.put().uri("/api/users/{id}", "6848dc02-c313-410e-8d3b-30f656375267")
+        webTestClient.put().uri("/api/users/{id}", userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -67,7 +71,7 @@ class UserEndpointsTest {
     @Test
     @Order(5)
     void shouldDeleteUser() {
-        webTestClient.delete().uri("/api/users/{id}", "6848dc02-c313-410e-8d3b-30f656375267")
+        webTestClient.delete().uri("/api/users/{id}", userId)
                 .exchange()
                 .expectStatus().isNoContent();
     }

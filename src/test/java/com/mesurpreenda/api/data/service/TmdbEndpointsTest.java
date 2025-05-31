@@ -151,13 +151,6 @@ class TmdbEndpointsTest {
     }
 
     @Test
-    void shouldGetUpcomingSeries() {
-        webTestClient.get().uri("/api/tmdb/upcoming/series")
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
     void shouldGetTopRatedMovies() {
         webTestClient.get().uri("/api/tmdb/top-rated/movies")
                 .exchange()
