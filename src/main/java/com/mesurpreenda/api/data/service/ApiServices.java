@@ -1,6 +1,7 @@
 package com.mesurpreenda.api.data.service;
 
 import com.mesurpreenda.api.data.entity.Movie;
+import com.mesurpreenda.api.data.entity.Series;
 import com.mesurpreenda.api.data.entity.User;
 import com.mesurpreenda.api.data.repository.MovieRepository;
 import com.mesurpreenda.api.data.repository.SeriesRepository;
@@ -61,13 +62,24 @@ public class ApiServices {
 
 
     @Transactional
-    public void addFavorite(String userId, Movie movie) {
+    public void addMovieToFavorites(String userId, Movie movie) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Movie savedMovie = movieRepo.save(movie);
 
         user.getFavoriteMovies().add(savedMovie);
+
+        userRepo.save(user);
+    }
+    @Transactional
+    public void addSeriesToFavorites(String userId, Series serie) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        Series savedSeries = seriesRepo.save(serie);
+
+        user.getFavoriteSeries().add(savedSeries);
 
         userRepo.save(user);
     }

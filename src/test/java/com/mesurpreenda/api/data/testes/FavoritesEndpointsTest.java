@@ -1,4 +1,4 @@
-package com.mesurpreenda.api.data.service;
+package com.mesurpreenda.api.data.testes;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +37,9 @@ class FavoritesEndpointsTest {
 
     @Test
     @Order(1)
-    void shouldAddFavoriteForUser() {
+    void shouldAddFavoriteMovieForUser() {
         webTestClient.post().uri(uriBuilder -> uriBuilder
-                        .path("/api/favorite/{id}")
+                        .path("/api/favorite/movie/{id}")
                         .queryParam("isMovie", true)
                         .build(userId))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -52,9 +52,26 @@ class FavoritesEndpointsTest {
                 .exchange()
                 .expectStatus().isOk();
     }
-
     @Test
     @Order(2)
+    void shouldAddFavoriteSeriesForUser() {
+        webTestClient.post().uri(uriBuilder -> uriBuilder
+                        .path("/api/favorite/series/{id}")
+                        .queryParam("isMovie", false)
+                        .build(userId))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "id": "550",
+                            "title": "Test series"
+                        }
+                        """)
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    @Order(3)
     void shouldGetFavoritesByUserId() {
         webTestClient.get().uri("/api/favorite/{id}", userId)
                 .exchange()
@@ -62,7 +79,7 @@ class FavoritesEndpointsTest {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void shouldRemoveFavoriteForUser() {
         webTestClient.delete().uri(uriBuilder -> uriBuilder
                         .path("/api/favorite/{id}")

@@ -1,4 +1,4 @@
-package com.mesurpreenda.api.data.service;
+package com.mesurpreenda.api.data.testes;
 
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
