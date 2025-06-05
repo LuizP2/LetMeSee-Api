@@ -72,6 +72,7 @@ public class ApiServices {
 
         userRepo.save(user);
     }
+
     @Transactional
     public void addSeriesToFavorites(String userId, Series serie) {
         User user = userRepo.findById(userId)

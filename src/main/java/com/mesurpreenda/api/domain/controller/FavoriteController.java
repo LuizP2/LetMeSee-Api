@@ -33,6 +33,7 @@ public class FavoriteController {
         userService.addMovieToFavorites(id, movie);
         return ResponseEntity.ok("Added to favorites");
     }
+
     @PostMapping("series/{id}")
     public ResponseEntity<String> addFavorite(@PathVariable String id, @RequestBody Series series) {
         userService.addSeriesToFavorites(id, series);

@@ -52,6 +52,7 @@ class FavoritesEndpointsTest {
                 .exchange()
                 .expectStatus().isOk();
     }
+
     @Test
     @Order(2)
     void shouldAddFavoriteSeriesForUser() {

@@ -58,6 +58,7 @@ class RandomFavoriteEndpointsTests {
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.title").isNotEmpty();
     }
+
     private void AddAnMovieToTheFavoritesList(String body) {
         webTestClient.post().uri(uriBuilder ->
                         uriBuilder.path("/api/favorite/movie/{id}")
@@ -67,6 +68,7 @@ class RandomFavoriteEndpointsTests {
                 .bodyValue(body)
                 .exchange().expectStatus().isOk();
     }
+
     private void AddAnSeriesToTheFavoritesList(String body) {
         webTestClient.post().uri(uriBuilder ->
                         uriBuilder.path("/api/favorite/series/{id}")

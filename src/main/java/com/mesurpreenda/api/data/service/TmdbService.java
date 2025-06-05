@@ -62,8 +62,8 @@ public class TmdbService {
     }
 
     private <T> Mono<T> getWithBearerToken(String path,
-                                     ParameterizedTypeReference<T> typeRef,
-                                     Object... uriVariables) {
+                                           ParameterizedTypeReference<T> typeRef,
+                                           Object... uriVariables) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(path)

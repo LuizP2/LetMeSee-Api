@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SeriesDTO {
-    private Long id;     // Pode ser nulo se quiser que o banco gere o ID.
+    private Long id;
     private String title;
     private String genre;
     private Integer seasons;
