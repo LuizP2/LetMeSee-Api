@@ -18,7 +18,6 @@ public class WatchListController {
     @Autowired
     private WatchListService watchListService;
 
-    // 1) Criar nova watchlist (com colaborador inicial)
     @PostMapping
     public ResponseEntity<WatchList> createWatchList(
             @RequestParam("title") String title,
@@ -29,7 +28,6 @@ public class WatchListController {
         return ResponseEntity.created(location).body(created);
     }
 
-    // 2) Listar todas as watchlists
     @GetMapping
     public List<WatchList> getAllWatchLists() {
         return watchListService.getAllWatchLists();
