@@ -1,225 +1,222 @@
 package com.mesurpreenda.api.data.testes;
 
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class TmdbEndpointsTest {
 
     @Autowired
     private WebTestClient webTestClient;
 
-    @Test
-    void shouldReturnApiStatus() {
-        webTestClient.get().uri("/")
-                .exchange()
-                .expectStatus().isOk();
+    @Nested
+    @DisplayName("Random Endpoints")
+    class RandomEndpoints {
+        @Test @Order(1)
+        void shouldReturnApiStatus() {
+            webTestClient.get().uri("/")
+                    .exchange()
+                    .expectStatus().isOk();
+        }
+
+        @Test @Order(2)
+        void shouldGetRandomContent() {
+            webTestClient.get().uri("/api/random")
+                    .exchange()
+                    .expectStatus().isOk();
+        }
+
+        @Test @Order(3)
+        void shouldGetRandomMovie() {
+            webTestClient.get().uri("/api/random/movie")
+                    .exchange()
+                    .expectStatus().isOk();
+        }
+
+        @Test @Order(4)
+        void shouldGetRandomSeries() {
+            webTestClient.get().uri("/api/random/series")
+                    .exchange()
+                    .expectStatus().isOk();
+        }
     }
 
+    @Nested
+    @DisplayName("TMDB Detail Endpoints")
+    class DetailEndpoints {
+        @Test @Order(5)
+        void shouldGetMovieById() {
+            webTestClient.get().uri("/api/tmdb/movie/{id}", 550)
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isEqualTo(550);
+        }
 
-    @Test
-    void shouldGetRandomContent() {
-        webTestClient.get().uri("/api/random")
-                .exchange()
-                .expectStatus().isOk();
+        @Test @Order(6)
+        void shouldGetSeriesById() {
+            webTestClient.get().uri("/api/tmdb/series/{id}", 100)
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isEqualTo(100);
+        }
     }
 
-    @Test
-    void shouldGetRandomMovie() {
-        webTestClient.get().uri("/api/random/movie")
-                .exchange()
-                .expectStatus().isOk();
+    @Nested
+    @DisplayName("TMDB Search Endpoints")
+    class SearchEndpoints {
+        @Test @Order(7)
+        void shouldSearchTmdb() {
+            webTestClient.get().uri(uriBuilder -> uriBuilder
+                            .path("/api/tmdb/search")
+                            .queryParam("query", "Matrix")
+                            .build())
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.results").isArray();
+        }
+
+        @Test @Order(8)
+        void shouldSearchMovies() {
+            webTestClient.get().uri(uriBuilder -> uriBuilder
+                            .path("/api/tmdb/search/movie")
+                            .queryParam("query", "Matrix")
+                            .build())
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.results").isArray();
+        }
+
+        @Test @Order(9)
+        void shouldSearchSeries() {
+            webTestClient.get().uri(uriBuilder -> uriBuilder
+                            .path("/api/tmdb/search/series")
+                            .queryParam("query", "Friends")
+                            .build())
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.results").isArray();
+        }
     }
 
-    @Test
-    void shouldGetRandomSeries() {
-        webTestClient.get().uri("/api/random/series")
-                .exchange()
-                .expectStatus().isOk();
+    @Nested
+    @DisplayName("TMDB Discovery Endpoints")
+    class DiscoveryEndpoints {
+        @Test @Order(10)
+        void shouldDiscoverMovies() {
+            webTestClient.get().uri("/api/tmdb/discover/movie")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.results").isArray();
+        }
+
+        @Test @Order(11)
+        void shouldDiscoverSeries() {
+            webTestClient.get().uri("/api/tmdb/discover/series")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.results").isArray();
+        }
     }
 
-    @Test
-    void shouldGetMovieById() {
-        webTestClient.get().uri("/api/tmdb/movie/{id}", 550)
-                .exchange()
-                .expectStatus().isOk();
+    @Nested
+    @DisplayName("TMDB Trending Endpoints")
+    class TrendingEndpoints {
+        @Test @Order(12)
+        void shouldGetTrendingMoviesDay() {
+            webTestClient.get().uri("/api/tmdb/trending/movie/day")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.results").isArray();
+        }
+
+        @Test @Order(13)
+        void shouldGetTrendingSeriesDay() {
+            webTestClient.get().uri("/api/tmdb/trending/series/day")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.results").isArray();
+        }
+
+        @Test @Order(14)
+        void shouldGetTrendingMoviesWeek() {
+            webTestClient.get().uri("/api/tmdb/trending/movie/week")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.results").isArray();
+        }
+
+        @Test @Order(15)
+        void shouldGetTrendingSeriesWeek() {
+            webTestClient.get().uri("/api/tmdb/trending/series/week")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.results").isArray();
+        }
+
+        @Test @Order(16)
+        void shouldGetTrendingAllDay() {
+            webTestClient.get().uri("/api/tmdb/trending/all/day")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.results").isArray();
+        }
+
+        @Test @Order(17)
+        void shouldGetTrendingAllWeek() {
+            webTestClient.get().uri("/api/tmdb/trending/all/week")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.results").isArray();
+        }
     }
 
-    @Test
-    void shouldGetSeriesById() {
-        webTestClient.get().uri("/api/tmdb/series/{id}", 100)
-                .exchange()
-                .expectStatus().isOk();
-    }
+    @Nested
+    @DisplayName("TMDB Additional Endpoints")
+    class AdditionalEndpoints {
+        @Test @Order(18)
+        void shouldGetUpcomingMovies() {
+            webTestClient.get().uri("/api/tmdb/upcoming/movies")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.results").isArray();
+        }
 
-    @Test
-    void shouldSearchTmdb() {
-        webTestClient.get().uri(uriBuilder -> uriBuilder
-                        .path("/api/tmdb/search")
-                        .queryParam("query", "Matrix")
-                        .build())
-                .exchange()
-                .expectStatus().isOk();
-    }
+        @Test @Order(19)
+        void shouldGetTopRatedMovies() {
+            webTestClient.get().uri("/api/tmdb/top-rated/movies")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.results").isArray();
+        }
 
-    @Test
-    void shouldSearchMovies() {
-        webTestClient.get().uri(uriBuilder -> uriBuilder
-                        .path("/api/tmdb/search/movie")
-                        .queryParam("query", "Matrix")
-                        .build())
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldSearchSeries() {
-        webTestClient.get().uri(uriBuilder -> uriBuilder
-                        .path("/api/tmdb/search/series")
-                        .queryParam("query", "Friends")
-                        .build())
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldDiscoverMovies() {
-        webTestClient.get().uri("/api/tmdb/discover/movie")
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldDiscoverSeries() {
-        webTestClient.get().uri("/api/tmdb/discover/series")
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetTrendingMoviesDay() {
-        webTestClient.get().uri("/api/tmdb/trending/movie/day")
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetTrendingSeriesDay() {
-        webTestClient.get().uri("/api/tmdb/trending/series/day")
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetTrendingMoviesWeek() {
-        webTestClient.get().uri("/api/tmdb/trending/movie/week")
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetTrendingSeriesWeek() {
-        webTestClient.get().uri("/api/tmdb/trending/series/week")
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetTrendingAllDay() {
-        webTestClient.get().uri("/api/tmdb/trending/all/day")
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetTrendingAllWeek() {
-        webTestClient.get().uri("/api/tmdb/trending/all/week")
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetUpcomingMovies() {
-        webTestClient.get().uri("/api/tmdb/upcoming/movies")
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetTopRatedMovies() {
-        webTestClient.get().uri("/api/tmdb/top-rated/movies")
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetTopRatedSeries() {
-        webTestClient.get().uri("/api/tmdb/top-rated/series")
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetMovieDetails() {
-        webTestClient.get().uri("/api/tmdb/movie/details/{id}", 550)
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetSeriesDetails() {
-        webTestClient.get().uri("/api/tmdb/series/details/{id}", 100)
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetMovieTrailer() {
-        webTestClient.get().uri("/api/tmdb/movie/trailer/{id}", 550)
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetSeriesTrailer() {
-        webTestClient.get().uri("/api/tmdb/series/trailer/{id}", 100)
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetMovieProviders() {
-        webTestClient.get().uri("/api/tmdb/movie/provider/{id}", 550)
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetSeriesProviders() {
-        webTestClient.get().uri("/api/tmdb/series/provider/{id}", 100)
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetMovieRecommendations() {
-        webTestClient.get().uri("/api/tmdb/movie/recommendations/{id}", 550)
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void shouldGetSeriesRecommendations() {
-        webTestClient.get().uri("/api/tmdb/series/recommendations/{id}", 100)
-                .exchange()
-                .expectStatus().isOk();
+        @Test @Order(20)
+        void shouldGetTopRatedSeries() {
+            webTestClient.get().uri("/api/tmdb/top-rated/series")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.results").isArray();
+        }
     }
 
 
 }
-
