@@ -51,20 +51,17 @@ class WatchListServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Usuário de exemplo
         existingUser = new User();
         existingUser.setId("user-123");
         existingUser.setName("Alice");
         existingUser.setEmail("alice@example.com");
 
-        // WatchList de exemplo
         existingWatchList = new WatchList();
         existingWatchList.setId("wl-abc");
         existingWatchList.setTitle("MinhaLista");
 
-        // Filme e Série de exemplo
         sampleMovie = new Movie();
-        sampleMovie.setId(Long.valueOf("550"));             // note que Movie.id é String com UUID gerado externamente
+        sampleMovie.setId(Long.valueOf("550"));
         sampleMovie.setTitle("Inception");
         sampleMovie.setGenre("Sci-Fi");
         sampleMovie.setYear(2010);
@@ -83,18 +80,21 @@ class WatchListServiceTest {
         @Test
         @DisplayName("Deve criar WatchList com colaborador inicial")
         void createWatchList_success() {
-            // Configurar mocks:
+            // 1) Mock para usuário existir
             when(userRepo.findById("user-123")).thenReturn(Optional.of(existingUser));
 
-            // Chamando o método
+            // 2) Mock para save devolver a própria entidade
+            when(watchListRepo.save(any(WatchList.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+
+            // 3) Execução
             WatchList result = service.createWatchList("FilmesTop", "user-123");
 
-            // Verificações:
+            // 4) Verificações
             assertThat(result).isNotNull();
             assertThat(result.getTitle()).isEqualTo("FilmesTop");
             assertThat(result.getCollaborators()).containsExactly(existingUser);
-            // Como o ID é gerado pelo JPA, não podemos prever o valor. Mas
-            // garantimos que watchListRepo.save() foi chamado:
+
             verify(watchListRepo, times(1)).save(any(WatchList.class));
         }
 
@@ -102,6 +102,7 @@ class WatchListServiceTest {
         @DisplayName("Deve lançar 404 se usuário não existir ao criar WatchList")
         void createWatchList_userNotFound() {
             when(userRepo.findById("missing")).thenReturn(Optional.empty());
+            // Não precisamos stubar save, já que nem chegaremos lá
 
             assertThatThrownBy(() -> service.createWatchList("Qualquer", "missing"))
                     .isInstanceOf(ResponseStatusException.class)
@@ -114,7 +115,6 @@ class WatchListServiceTest {
         @DisplayName("Deve retornar lista de todas as WatchLists")
         void getAllWatchLists_success() {
             List<WatchList> fakeList = List.of(existingWatchList);
-
             when(watchListRepo.findAll()).thenReturn(fakeList);
 
             List<WatchList> result = service.getAllWatchLists();
@@ -149,12 +149,16 @@ class WatchListServiceTest {
         @DisplayName("Deve atualizar título da WatchList")
         void updateWatchListTitle_success() {
             when(watchListRepo.findById("wl-abc")).thenReturn(Optional.of(existingWatchList));
-            ArgumentCaptor<WatchList> captor = ArgumentCaptor.forClass(WatchList.class);
+
+            // Stubar save para devolver a própria entidade alterada
+            when(watchListRepo.save(any(WatchList.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
 
             Optional<WatchList> maybe = service.updateWatchListTitle("wl-abc", "NovoTítulo");
             assertThat(maybe).isPresent();
             assertThat(maybe.get().getTitle()).isEqualTo("NovoTítulo");
 
+            ArgumentCaptor<WatchList> captor = ArgumentCaptor.forClass(WatchList.class);
             verify(watchListRepo).save(captor.capture());
             assertThat(captor.getValue().getTitle()).isEqualTo("NovoTítulo");
         }
@@ -192,6 +196,7 @@ class WatchListServiceTest {
             verify(watchListRepo, never()).delete(any());
         }
     }
+
 
     @Nested
     @DisplayName("Gerenciar colaboradores")

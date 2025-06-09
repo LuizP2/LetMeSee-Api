@@ -1,5 +1,6 @@
 package com.mesurpreenda.api.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +16,8 @@ public class TmdbResultDTO {
     private Long id;
     private String overview;
     private String poster_path;
+    @JsonAlias({ "title", "name" })
     private String title;
+    @JsonAlias({"release_date", "first_air_date"})
     private String release_date;
 }
