@@ -9,7 +9,7 @@ import org.hibernate.annotations.GenericGenerator;
 import java.util.ArrayList;
 import java.util.List;
 
-@Table(name = "user")
+@Table(name = "users")
 @Entity
 @Getter
 @Setter

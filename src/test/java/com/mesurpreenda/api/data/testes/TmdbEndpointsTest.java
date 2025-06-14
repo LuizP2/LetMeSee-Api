@@ -16,28 +16,32 @@ class TmdbEndpointsTest {
     @Nested
     @DisplayName("Random Endpoints")
     class RandomEndpoints {
-        @Test @Order(1)
+        @Test
+        @Order(1)
         void shouldReturnApiStatus() {
             webTestClient.get().uri("/")
                     .exchange()
                     .expectStatus().isOk();
         }
 
-        @Test @Order(2)
+        @Test
+        @Order(2)
         void shouldGetRandomContent() {
             webTestClient.get().uri("/api/random")
                     .exchange()
                     .expectStatus().isOk();
         }
 
-        @Test @Order(3)
+        @Test
+        @Order(3)
         void shouldGetRandomMovie() {
             webTestClient.get().uri("/api/random/movie")
                     .exchange()
                     .expectStatus().isOk();
         }
 
-        @Test @Order(4)
+        @Test
+        @Order(4)
         void shouldGetRandomSeries() {
             webTestClient.get().uri("/api/random/series")
                     .exchange()
@@ -48,7 +52,8 @@ class TmdbEndpointsTest {
     @Nested
     @DisplayName("TMDB Detail Endpoints")
     class DetailEndpoints {
-        @Test @Order(5)
+        @Test
+        @Order(5)
         void shouldGetMovieById() {
             webTestClient.get().uri("/api/tmdb/movie/{id}", 550)
                     .exchange()
@@ -57,7 +62,8 @@ class TmdbEndpointsTest {
                     .jsonPath("$.id").isEqualTo(550);
         }
 
-        @Test @Order(6)
+        @Test
+        @Order(6)
         void shouldGetSeriesById() {
             webTestClient.get().uri("/api/tmdb/series/{id}", 100)
                     .exchange()
@@ -70,7 +76,8 @@ class TmdbEndpointsTest {
     @Nested
     @DisplayName("TMDB Search Endpoints")
     class SearchEndpoints {
-        @Test @Order(7)
+        @Test
+        @Order(7)
         void shouldSearchTmdb() {
             webTestClient.get().uri(uriBuilder -> uriBuilder
                             .path("/api/tmdb/search")
@@ -82,7 +89,8 @@ class TmdbEndpointsTest {
                     .jsonPath("$.results").isArray();
         }
 
-        @Test @Order(8)
+        @Test
+        @Order(8)
         void shouldSearchMovies() {
             webTestClient.get().uri(uriBuilder -> uriBuilder
                             .path("/api/tmdb/search/movie")
@@ -94,7 +102,8 @@ class TmdbEndpointsTest {
                     .jsonPath("$.results").isArray();
         }
 
-        @Test @Order(9)
+        @Test
+        @Order(9)
         void shouldSearchSeries() {
             webTestClient.get().uri(uriBuilder -> uriBuilder
                             .path("/api/tmdb/search/series")
@@ -110,7 +119,8 @@ class TmdbEndpointsTest {
     @Nested
     @DisplayName("TMDB Discovery Endpoints")
     class DiscoveryEndpoints {
-        @Test @Order(10)
+        @Test
+        @Order(10)
         void shouldDiscoverMovies() {
             webTestClient.get().uri("/api/tmdb/discover/movie")
                     .exchange()
@@ -119,7 +129,8 @@ class TmdbEndpointsTest {
                     .jsonPath("$.results").isArray();
         }
 
-        @Test @Order(11)
+        @Test
+        @Order(11)
         void shouldDiscoverSeries() {
             webTestClient.get().uri("/api/tmdb/discover/series")
                     .exchange()
@@ -132,7 +143,8 @@ class TmdbEndpointsTest {
     @Nested
     @DisplayName("TMDB Trending Endpoints")
     class TrendingEndpoints {
-        @Test @Order(12)
+        @Test
+        @Order(12)
         void shouldGetTrendingMoviesDay() {
             webTestClient.get().uri("/api/tmdb/trending/movie/day")
                     .exchange()
@@ -141,7 +153,8 @@ class TmdbEndpointsTest {
                     .jsonPath("$.results").isArray();
         }
 
-        @Test @Order(13)
+        @Test
+        @Order(13)
         void shouldGetTrendingSeriesDay() {
             webTestClient.get().uri("/api/tmdb/trending/series/day")
                     .exchange()
@@ -150,7 +163,8 @@ class TmdbEndpointsTest {
                     .jsonPath("$.results").isArray();
         }
 
-        @Test @Order(14)
+        @Test
+        @Order(14)
         void shouldGetTrendingMoviesWeek() {
             webTestClient.get().uri("/api/tmdb/trending/movie/week")
                     .exchange()
@@ -159,7 +173,8 @@ class TmdbEndpointsTest {
                     .jsonPath("$.results").isArray();
         }
 
-        @Test @Order(15)
+        @Test
+        @Order(15)
         void shouldGetTrendingSeriesWeek() {
             webTestClient.get().uri("/api/tmdb/trending/series/week")
                     .exchange()
@@ -168,7 +183,8 @@ class TmdbEndpointsTest {
                     .jsonPath("$.results").isArray();
         }
 
-        @Test @Order(16)
+        @Test
+        @Order(16)
         void shouldGetTrendingAllDay() {
             webTestClient.get().uri("/api/tmdb/trending/all/day")
                     .exchange()
@@ -177,7 +193,8 @@ class TmdbEndpointsTest {
                     .jsonPath("$.results").isArray();
         }
 
-        @Test @Order(17)
+        @Test
+        @Order(17)
         void shouldGetTrendingAllWeek() {
             webTestClient.get().uri("/api/tmdb/trending/all/week")
                     .exchange()
@@ -190,7 +207,8 @@ class TmdbEndpointsTest {
     @Nested
     @DisplayName("TMDB Additional Endpoints")
     class AdditionalEndpoints {
-        @Test @Order(18)
+        @Test
+        @Order(18)
         void shouldGetUpcomingMovies() {
             webTestClient.get().uri("/api/tmdb/upcoming/movies")
                     .exchange()
@@ -199,7 +217,8 @@ class TmdbEndpointsTest {
                     .jsonPath("$.results").isArray();
         }
 
-        @Test @Order(19)
+        @Test
+        @Order(19)
         void shouldGetTopRatedMovies() {
             webTestClient.get().uri("/api/tmdb/top-rated/movies")
                     .exchange()
@@ -208,7 +227,8 @@ class TmdbEndpointsTest {
                     .jsonPath("$.results").isArray();
         }
 
-        @Test @Order(20)
+        @Test
+        @Order(20)
         void shouldGetTopRatedSeries() {
             webTestClient.get().uri("/api/tmdb/top-rated/series")
                     .exchange()

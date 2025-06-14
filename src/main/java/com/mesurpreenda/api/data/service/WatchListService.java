@@ -33,6 +33,7 @@ public class WatchListService {
 
     @Autowired
     private UserRepository userRepo;
+
     public WatchList createWatchList(String title, String creatorUserId) {
         User creator = userRepo.findById(creatorUserId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -74,6 +75,7 @@ public class WatchListService {
         wl.getCollaborators().add(user);
         watchListRepo.save(wl);
     }
+
     @Transactional
     public void removeCollaborator(String watchListId, String userId) {
         WatchList wl = watchListRepo.findById(watchListId)
