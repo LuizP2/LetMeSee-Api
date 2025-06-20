@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+
 @Setter
 @Getter
 @Component
@@ -33,7 +35,7 @@ public class TmdbResponseMapper {
         Series series = new Series();
         series.setTitle(dto.getTitle());
         series.setGenre(dto.getGenre());
-        series.setSeasons(dto.getSeasons());
+        series.setSeasons(dto.getSeasons() != null ? dto.getSeasons() : new ArrayList<>());
         return series;
     }
 

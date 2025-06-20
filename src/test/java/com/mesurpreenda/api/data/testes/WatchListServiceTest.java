@@ -20,6 +20,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,13 +67,14 @@ class WatchListServiceTest {
         sampleMovie.setId(Long.valueOf("550"));
         sampleMovie.setTitle("Inception");
         sampleMovie.setGenre("Sci-Fi");
-        sampleMovie.setYear(2010);
+        sampleMovie.setYear("2010");
 
-        sampleSeries = new Series();
-        sampleSeries.setId(Long.valueOf("100"));
-        sampleSeries.setTitle("Breaking Bad");
-        sampleSeries.setGenre("Drama");
-        sampleSeries.setSeasons(5);
+        Series series = new Series();
+        series.setId(1L);
+        series.setTitle("Test Series");
+        series.setGenre(Arrays.asList(1, 2, 3));
+        series.setSeasons(new ArrayList<>());
+        sampleSeries = series;
     }
 
     @Nested

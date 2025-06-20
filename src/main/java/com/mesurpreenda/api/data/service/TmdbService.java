@@ -1,7 +1,9 @@
 package com.mesurpreenda.api.data.service;
 
+import com.mesurpreenda.api.domain.dto.ProvidersDTO;
 import com.mesurpreenda.api.domain.dto.TmdbResponseDTO;
 import com.mesurpreenda.api.domain.dto.TmdbResultDTO;
+import com.mesurpreenda.api.domain.dto.TrailersDTO;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -69,10 +71,30 @@ public class TmdbService {
                         .path(path)
                         .queryParam("api_key", apiKey)
                         .queryParam("language", "pt-BR")
-                        .queryParam("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2YjBmNDA2NGYzODVmN2JlMTFkOGNjODU4YjEyODQ3OCIsIm5iZiI6MTc0ODAyNDE1Ni41NjQsInN1YiI6IjY4MzBiYjVjMWY0MWJlNThiOWI2YTk0ZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.kXV_fQB4yhveL21yjx5T5vvNwZVaijWHkxk_XqGXdl4")
                         .build(uriVariables))
                 .retrieve()
                 .bodyToMono(typeRef);
+    }
+
+    private Mono<TrailersDTO> getTrailers(String path, Long id) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(path)
+                        .queryParam("api_key", apiKey)
+                        .queryParam("language", "pt-BR")
+                        .build(id))
+                .retrieve()
+                .bodyToMono(TrailersDTO.class);
+    }
+
+    private Mono<ProvidersDTO> getProviders(String path, Long id) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(path)
+                        .queryParam("api_key", apiKey)
+                        .build(id))
+                .retrieve()
+                .bodyToMono(ProvidersDTO.class);
     }
 
     public Mono<TmdbResultDTO> getMovieById(Long movieId) {
@@ -197,12 +219,12 @@ public class TmdbService {
                 });
     }
 
-    public Mono<TmdbResultDTO> getTrailerByMovieId(Long movieId) {
-        return getWithId("/movie/{movie_id}/videos", movieId);
+    public Mono<TrailersDTO> getTrailerByMovieId(Long movieId) {
+        return getTrailers("/movie/{movie_id}/videos", movieId);
     }
 
-    public Mono<TmdbResultDTO> getTrailerBySeriesId(Long seriesId) {
-        return getWithId("/tv/{tv_id}/videos", seriesId);
+    public Mono<TrailersDTO> getTrailerBySeriesId(Long seriesId) {
+        return getTrailers("/tv/{tv_id}/videos", seriesId);
     }
 
     public Mono<TmdbResultDTO> getMovieDetails(Long movieId) {
@@ -213,12 +235,12 @@ public class TmdbService {
         return getWithId("/tv/{tv_id}", seriesId);
     }
 
-    public Mono<TmdbResultDTO> getMovieProviders(Long movieId) {
-        return getWithId("/movie/{movie_id}/watch/providers", movieId);
+    public Mono<ProvidersDTO> getMovieProviders(Long movieId) {
+        return getProviders("/movie/{movie_id}/watch/providers", movieId);
     }
 
-    public Mono<TmdbResultDTO> getSeriesProviders(Long seriesId) {
-        return getWithId("/tv/{tv_id}/watch/providers", seriesId);
+    public Mono<ProvidersDTO> getSeriesProviders(Long seriesId) {
+        return getProviders("/tv/{tv_id}/watch/providers", seriesId);
     }
 
     public Mono<TmdbResultDTO> getMovieRecommendations(Long movieId) {
@@ -228,5 +250,4 @@ public class TmdbService {
     public Mono<TmdbResultDTO> getSeriesRecommendations(Long seriesId) {
         return getWithId("/tv/{tv_id}/recommendations", seriesId);
     }
-
 }

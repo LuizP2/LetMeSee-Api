@@ -1,15 +1,15 @@
 package com.mesurpreenda.api.domain.dto;
 
-import lombok.Data;
+import com.mesurpreenda.api.domain.model.Season;
 import lombok.Getter;
 import lombok.Setter;
+import java.util.List;
 
-@Data
 @Getter
 @Setter
 public class SeriesDTO {
     private Long id;
     private String title;
-    private String genre;
-    private Integer seasons;
+    private List<Integer> genre;
+    private List<Season> seasons;
 }

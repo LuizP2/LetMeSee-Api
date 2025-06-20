@@ -1,23 +1,41 @@
 package com.mesurpreenda.api.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.List;
 
 @Getter
 @Setter
-@Data
 public class TmdbResultDTO {
-    private String backdrop_path;
-    private List<Integer> genre_ids;
+    @JsonProperty("homepage")
+    private String homepage;
+
+    @JsonProperty("popularity")
+    private Double popularity;
+
+    @JsonProperty("backdrop_path")
+    private String backdropPath;
+    
+    @JsonProperty("genres")
+    private List<TmdbGenreDTO> genres;
+
+    @JsonProperty("genre_ids")
+    private List<Integer> genreIds;
+    
+    @JsonProperty("id")
     private Long id;
+    
+    @JsonProperty("overview")
     private String overview;
-    private String poster_path;
+       
+    @JsonProperty("poster_path")
+    private String posterPath;
+    
     @JsonAlias({"title", "name"})
     private String title;
+    
     @JsonAlias({"release_date", "first_air_date"})
-    private String release_date;
+    private String releaseDate;
 }

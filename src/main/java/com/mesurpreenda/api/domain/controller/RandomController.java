@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/api")
@@ -23,9 +25,29 @@ public class RandomController {
 
     @GetMapping("/random")
     public ResponseEntity<Object> random() {
-        Optional<Movie> randomMovie = movieDAO.findRandom();
-        Optional<Series> randomSeries = seriesDAO.findRandom();
-        return randomMovie.<ResponseEntity<Object>>map(ResponseEntity::ok).orElseGet(() -> randomSeries.<ResponseEntity<Object>>map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("No content available")));
+        List<Object> allContent = getAllContent();
+        
+        if (allContent.isEmpty()) {
+            return createNotFoundResponse();
+        }
+        
+        return ResponseEntity.ok(getRandomContent(allContent));
+    }
+
+    private List<Object> getAllContent() {
+        List<Object> allContent = new ArrayList<>();
+        allContent.addAll(movieDAO.findAll());
+        allContent.addAll(seriesDAO.findAll());
+        return allContent;
+    }
+
+    private Object getRandomContent(List<Object> content) {
+        return content.get(new Random().nextInt(content.size()));
+    }
+
+    private ResponseEntity<Object> createNotFoundResponse() {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body("No content available");
     }
 
     @GetMapping("/random/movie")

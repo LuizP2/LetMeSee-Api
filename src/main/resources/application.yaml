@@ -4,9 +4,9 @@ spring:
   profiles:
     active: prod
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: jdbc:mysql://localhost:3306/favoritesdb
+    username: root
+    password: 3010
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -21,6 +21,6 @@ server:
 
 tmdb:
   api:
-    key: ${TMDB_API_KEY}
-    token: ${TMDB_API_TOKEN}
-    url: ${TMDB_BASE_URL}
+    key: 6b0f4064f385f7be11d8cc858b128478
+    token: eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2YjBmNDA2NGYzODVmN2JlMTFkOGNjODU4YjEyODQ3OCIsIm5iZiI6MTc0ODAyNDE1Ni41NjQsInN1YiI6IjY4MzBiYjVjMWY0MWJlNThiOWI2YTk0ZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.kXV_fQB4yhveL21yjx5T5vvNwZVaijWHkxk_XqGXdl4
+    url: https://api.themoviedb.org/3

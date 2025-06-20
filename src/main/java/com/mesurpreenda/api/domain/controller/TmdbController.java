@@ -1,8 +1,10 @@
 package com.mesurpreenda.api.domain.controller;
 
 import com.mesurpreenda.api.data.service.TmdbService;
+import com.mesurpreenda.api.domain.dto.ProvidersDTO;
 import com.mesurpreenda.api.domain.dto.TmdbResponseDTO;
 import com.mesurpreenda.api.domain.dto.TmdbResultDTO;
+import com.mesurpreenda.api.domain.dto.TrailersDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -105,22 +107,22 @@ public class TmdbController {
     }
 
     @GetMapping("movie/trailer/{id}")
-    public Mono<TmdbResultDTO> getTrailerByMovieId(@PathVariable Long id) {
+    public Mono<TrailersDTO> getTrailerByMovieId(@PathVariable Long id) {
         return tmdbService.getTrailerByMovieId(id);
     }
 
     @GetMapping("series/trailer/{id}")
-    public Mono<TmdbResultDTO> getTrailerBySeriesId(@PathVariable Long id) {
+    public Mono<TrailersDTO> getTrailerBySeriesId(@PathVariable Long id) {
         return tmdbService.getTrailerBySeriesId(id);
     }
 
     @GetMapping("/movie/provider/{id}")
-    public Mono<TmdbResultDTO> getMovieProviderById(@PathVariable Long id) {
+    public Mono<ProvidersDTO> getMovieProviderById(@PathVariable Long id) {
         return tmdbService.getMovieProviders(id);
     }
 
     @GetMapping("/series/provider/{id}")
-    public Mono<TmdbResultDTO> getSeriesProviderById(@PathVariable Long id) {
+    public Mono<ProvidersDTO> getSeriesProviderById(@PathVariable Long id) {
         return tmdbService.getSeriesProviders(id);
     }
 
