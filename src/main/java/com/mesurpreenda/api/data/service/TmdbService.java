@@ -4,6 +4,7 @@ import com.mesurpreenda.api.domain.dto.ProvidersDTO;
 import com.mesurpreenda.api.domain.dto.TmdbResponseDTO;
 import com.mesurpreenda.api.domain.dto.TmdbResultDTO;
 import com.mesurpreenda.api.domain.dto.TrailersDTO;
+import com.mesurpreenda.api.domain.dto.RecommendationsDTO;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -95,6 +96,17 @@ public class TmdbService {
                         .build(id))
                 .retrieve()
                 .bodyToMono(ProvidersDTO.class);
+    }
+
+    private Mono<RecommendationsDTO> getRecommendations(String path, Long id) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(path)
+                        .queryParam("api_key", apiKey)
+                        .queryParam("language", "pt-BR")
+                        .build(id))
+                .retrieve()
+                .bodyToMono(RecommendationsDTO.class);
     }
 
     public Mono<TmdbResultDTO> getMovieById(Long movieId) {
@@ -243,11 +255,11 @@ public class TmdbService {
         return getProviders("/tv/{tv_id}/watch/providers", seriesId);
     }
 
-    public Mono<TmdbResultDTO> getMovieRecommendations(Long movieId) {
-        return getWithId("/movie/{movie_id}/recommendations", movieId);
+    public Mono<RecommendationsDTO> getMovieRecommendations(Long movieId) {
+        return getRecommendations("/movie/{movie_id}/recommendations", movieId);
     }
 
-    public Mono<TmdbResultDTO> getSeriesRecommendations(Long seriesId) {
-        return getWithId("/tv/{tv_id}/recommendations", seriesId);
+    public Mono<RecommendationsDTO> getSeriesRecommendations(Long seriesId) {
+        return getRecommendations("/tv/{tv_id}/recommendations", seriesId);
     }
 }

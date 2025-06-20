@@ -5,6 +5,7 @@ import com.mesurpreenda.api.domain.dto.ProvidersDTO;
 import com.mesurpreenda.api.domain.dto.TmdbResponseDTO;
 import com.mesurpreenda.api.domain.dto.TmdbResultDTO;
 import com.mesurpreenda.api.domain.dto.TrailersDTO;
+import com.mesurpreenda.api.domain.dto.RecommendationsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -127,12 +128,12 @@ public class TmdbController {
     }
 
     @GetMapping("/movie/recommendations/{id}")
-    public Mono<TmdbResultDTO> getMovieRecommendations(@PathVariable Long id) {
+    public Mono<RecommendationsDTO> getMovieRecommendations(@PathVariable Long id) {
         return tmdbService.getMovieRecommendations(id);
     }
 
     @GetMapping("/series/recommendations/{id}")
-    public Mono<TmdbResultDTO> getSeriesRecommendations(@PathVariable Long id) {
+    public Mono<RecommendationsDTO> getSeriesRecommendations(@PathVariable Long id) {
         return tmdbService.getSeriesRecommendations(id);
     }
 }
