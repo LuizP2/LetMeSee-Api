@@ -7,18 +7,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FavoritesEndpointsTest {
 
     @Autowired
     private WebTestClient webTestClient;
 
-    private static String userId;
+    private String userId;
 
-    @Test
-    @Order(0)
-    void shouldCreateUser() {
+    @BeforeAll
+    void setUp() {
+        createTestUser();
+    }
+
+    private void createTestUser() {
         webTestClient.post().uri("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -30,64 +32,67 @@ class FavoritesEndpointsTest {
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody()
-                .jsonPath("$.id").value(id -> {
-                    userId = id.toString();
-                });
+                .jsonPath("$.id").value(id -> userId = id.toString());
     }
 
-    @Test
-    @Order(1)
-    void shouldAddFavoriteMovieForUser() {
-        webTestClient.post().uri(uriBuilder -> uriBuilder
-                        .path("/api/favorite/movie/{id}")
-                        .queryParam("isMovie", true)
-                        .build(userId))
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "id": "550",
-                            "title": "Test Movie"
-                        }
-                        """)
-                .exchange()
-                .expectStatus().isOk();
-    }
+    @Nested
+    @DisplayName("Gerenciar Favoritos")
+    class ManageFavorites {
 
-    @Test
-    @Order(2)
-    void shouldAddFavoriteSeriesForUser() {
-        webTestClient.post().uri(uriBuilder -> uriBuilder
-                        .path("/api/favorite/series/{id}")
-                        .queryParam("isMovie", false)
-                        .build(userId))
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "id": "550",
-                            "title": "Test series"
-                        }
-                        """)
-                .exchange()
-                .expectStatus().isOk();
-    }
+        @Test
+        @DisplayName("Deve adicionar filme aos favoritos")
+        void addFavoriteMovie_success() {
+            webTestClient.post().uri(uriBuilder -> uriBuilder
+                            .path("/api/favorite/movie/{id}")
+                            .queryParam("isMovie", true)
+                            .build(userId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "id": "550",
+                                "title": "Test Movie"
+                            }
+                            """)
+                    .exchange()
+                    .expectStatus().isOk();
+        }
 
-    @Test
-    @Order(3)
-    void shouldGetFavoritesByUserId() {
-        webTestClient.get().uri("/api/favorite/{id}", userId)
-                .exchange()
-                .expectStatus().isOk();
-    }
+        @Test
+        @DisplayName("Deve adicionar série aos favoritos")
+        void addFavoriteSeries_success() {
+            webTestClient.post().uri(uriBuilder -> uriBuilder
+                            .path("/api/favorite/series/{id}")
+                            .queryParam("isMovie", false)
+                            .build(userId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "id": "550",
+                                "title": "Test series"
+                            }
+                            """)
+                    .exchange()
+                    .expectStatus().isOk();
+        }
 
-    @Test
-    @Order(4)
-    void shouldRemoveFavoriteForUser() {
-        webTestClient.delete().uri(uriBuilder -> uriBuilder
-                        .path("/api/favorite/{id}")
-                        .queryParam("contentId", "550")
-                        .queryParam("isMovie", true)
-                        .build(userId))
-                .exchange()
-                .expectStatus().isOk();
+        @Test
+        @DisplayName("Deve listar favoritos do usuário")
+        void getFavorites_success() {
+            webTestClient.get().uri("/api/favorite/{id}", userId)
+                    .exchange()
+                    .expectStatus().isOk();
+        }
+
+        @Test
+        @DisplayName("Deve remover item dos favoritos")
+        void removeFavorite_success() {
+            webTestClient.delete().uri(uriBuilder -> uriBuilder
+                            .path("/api/favorite/{id}")
+                            .queryParam("contentId", "550")
+                            .queryParam("isMovie", true)
+                            .build(userId))
+                    .exchange()
+                    .expectStatus().isOk();
+        }
     }
 }

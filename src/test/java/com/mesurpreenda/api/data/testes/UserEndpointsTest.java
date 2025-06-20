@@ -9,7 +9,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserEndpointsTest {
 
@@ -18,9 +17,12 @@ class UserEndpointsTest {
 
     private String userId;
 
-    @Test
-    @Order(1)
-    void shouldCreateUser() {
+    @BeforeAll
+    void setUp() {
+        createTestUser();
+    }
+
+    private void createTestUser() {
         webTestClient.post().uri("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -36,52 +38,79 @@ class UserEndpointsTest {
         Assertions.assertNotNull(userId, "userId should have been set");
     }
 
-    @Test
-    @Order(2)
-    void shouldListAllUsers() {
-        webTestClient.get().uri("/api/users")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(Object.class)
-                .value(list -> assertThat(list).hasSizeGreaterThanOrEqualTo(1));
-    }
+    @Nested
+    @DisplayName("Gerenciar Usuários")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class ManageUsers {
+        
+        @Test
+        @Order(1)
+        @DisplayName("Deve criar um novo usuário")
+        void createUser_success() {
+            webTestClient.post().uri("/api/users")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "name": "Novo Usuário",
+                                "email": "novo@example.com"
+                            }
+                            """)
+                    .exchange()
+                    .expectStatus().isCreated()
+                    .expectBody()
+                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.name").isEqualTo("Novo Usuário")
+                    .jsonPath("$.email").isEqualTo("novo@example.com");
+        }
 
-    @Test
-    @Order(3)
-    void shouldGetUserById() {
-        Assertions.assertNotNull(userId, "userId must not be null");
-        webTestClient.get().uri("/api/users/{id}", userId)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.id").isEqualTo(userId);
-    }
+        @Test
+        @Order(2)
+        @DisplayName("Deve listar todos os usuários")
+        void getAllUsers_success() {
+            webTestClient.get().uri("/api/users")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBodyList(Object.class)
+                    .value(list -> assertThat(list).hasSizeGreaterThanOrEqualTo(1));
+        }
 
-    @Test
-    @Order(4)
-    void shouldUpdateUser() {
-        Assertions.assertNotNull(userId, "userId must not be null");
-        webTestClient.put().uri("/api/users/{id}", userId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "name": "Vitola Updated",
-                            "email": "vitola.updated@example.com"
-                        }
-                        """)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.name").isEqualTo("Vitola Updated")
-                .jsonPath("$.email").isEqualTo("vitola.updated@example.com");
-    }
+        @Test
+        @Order(3)
+        @DisplayName("Deve retornar usuário por ID")
+        void getUserById_success() {
+            webTestClient.get().uri("/api/users/{id}", userId)
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isEqualTo(userId);
+        }
 
-    @Test
-    @Order(5)
-    void shouldDeleteUser() {
-        Assertions.assertNotNull(userId, "userId must not be null");
-        webTestClient.delete().uri("/api/users/{id}", userId)
-                .exchange()
-                .expectStatus().isNoContent();
+        @Test
+        @Order(4)
+        @DisplayName("Deve atualizar dados do usuário")
+        void updateUser_success() {
+            webTestClient.put().uri("/api/users/{id}", userId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "name": "Vitola Updated",
+                                "email": "vitola.updated@example.com"
+                            }
+                            """)
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.name").isEqualTo("Vitola Updated")
+                    .jsonPath("$.email").isEqualTo("vitola.updated@example.com");
+        }
+
+        @Test
+        @Order(5)
+        @DisplayName("Deve excluir usuário existente")
+        void deleteUser_success() {
+            webTestClient.delete().uri("/api/users/{id}", userId)
+                    .exchange()
+                    .expectStatus().isNoContent();
+        }
     }
 }

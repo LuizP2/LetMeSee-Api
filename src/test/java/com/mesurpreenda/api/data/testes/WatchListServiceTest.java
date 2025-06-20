@@ -354,7 +354,7 @@ class WatchListServiceTest {
         void addSeriesToWatchList_success_existingSeries() {
             existingWatchList.getFavoriteSeries().clear();
             when(watchListRepo.findById("wl-abc")).thenReturn(Optional.of(existingWatchList));
-            when(seriesRepo.findById("100")).thenReturn(Optional.of(sampleSeries));
+            when(seriesRepo.findById("1")).thenReturn(Optional.of(sampleSeries));
 
             service.addSeriesToWatchList("wl-abc", sampleSeries);
 
