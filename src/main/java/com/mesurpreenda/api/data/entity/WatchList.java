@@ -22,6 +22,8 @@ public class WatchList {
 
     private String title;
 
+    private String creatorId;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "watchlist_movies",

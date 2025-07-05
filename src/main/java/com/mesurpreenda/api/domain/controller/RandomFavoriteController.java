@@ -2,13 +2,14 @@ package com.mesurpreenda.api.domain.controller;
 
 import com.mesurpreenda.api.data.entity.Movie;
 import com.mesurpreenda.api.data.entity.Series;
+import com.mesurpreenda.api.data.entity.User;
 import com.mesurpreenda.api.data.service.ApiServices;
 import com.mesurpreenda.api.domain.dto.FavoritesDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,22 +18,19 @@ import java.util.List;
 import java.util.Random;
 
 @RestController
-@RequestMapping("/api/random")
+@RequestMapping("/api/favorites/random")
 public class RandomFavoriteController {
 
     @Autowired
     private ApiServices userService;
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<Object> randomFromFavorites(@PathVariable String userId) {
-        FavoritesDTO favorites = userService.getFavorites(userId);
-
-        List<Movie> favoriteMovies = favorites.getFavoriteMovies();
-        List<Series> favoriteSeries = favorites.getFavoriteSeries();
+    @GetMapping
+    public ResponseEntity<Object> randomFromFavorites(@AuthenticationPrincipal User user) {
+        FavoritesDTO favorites = userService.getFavorites(user.getId());
 
         List<Object> combined = new ArrayList<>();
-        combined.addAll(favoriteMovies);
-        combined.addAll(favoriteSeries);
+        combined.addAll(favorites.getFavoriteMovies());
+        combined.addAll(favorites.getFavoriteSeries());
 
         if (combined.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No favorites available");
@@ -42,9 +40,9 @@ public class RandomFavoriteController {
         return ResponseEntity.ok(randomFavorite);
     }
 
-    @GetMapping("/movie/{userId}")
-    public ResponseEntity<Object> randomFavoriteMovie(@PathVariable String userId) {
-        FavoritesDTO favorites = userService.getFavorites(userId);
+    @GetMapping("/movie")
+    public ResponseEntity<Object> randomFavoriteMovie(@AuthenticationPrincipal User user) {
+        FavoritesDTO favorites = userService.getFavorites(user.getId());
         List<Movie> favoriteMovies = favorites.getFavoriteMovies();
 
         if (favoriteMovies.isEmpty()) {
@@ -55,9 +53,9 @@ public class RandomFavoriteController {
         return ResponseEntity.ok(randomMovie);
     }
 
-    @GetMapping("/series/{userId}")
-    public ResponseEntity<Object> randomFavoriteSeries(@PathVariable String userId) {
-        FavoritesDTO favorites = userService.getFavorites(userId);
+    @GetMapping("/series")
+    public ResponseEntity<Object> randomFavoriteSeries(@AuthenticationPrincipal User user) {
+        FavoritesDTO favorites = userService.getFavorites(user.getId());
         List<Series> favoriteSeries = favorites.getFavoriteSeries();
 
         if (favoriteSeries.isEmpty()) {

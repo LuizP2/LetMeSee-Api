@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 3010
+      MYSQL_DATABASE: letmesee_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p3010" ]
+      interval: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: springboot-app
+    ports:
+      - "3030:3030"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/letmesee_db?createDatabaseIfNotExist=true"
+      SPRING_DATASOURCE_USERNAME: "root"
+      SPRING_DATASOURCE_PASSWORD: "3010"
+      TMDB_API_KEY: "6b0f4064f385f7be11d8cc858b128478"
+      TMDB_API_TOKEN: "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2YjBmNDA2NGYzODVmN2JlMTFkOGNjODU4YjEyODQ3OCIsIm5iZiI6MTc0ODAyNDE1Ni41NjQsInN1YiI6IjY4MzBiYjVjMWY0MWJlNThiOWI2YTk0ZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.kXV_fQB4yhveL21yjx5T5vvNwZVaijWHkxk_XqGXdl4"
+      TMDB_BASE_URL: "https://api.themoviedb.org/3"
+      SPRING_PROFILES_ACTIVE: "docker"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  db_data:
+
+networks:
+  app-network:

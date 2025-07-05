@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 
@@ -34,12 +35,19 @@ public class WatchListService {
     @Autowired
     private UserRepository userRepo;
 
-    public WatchList createWatchList(String title, String creatorUserId) {
-        User creator = userRepo.findById(creatorUserId)
+    private void verifyOwnership(WatchList watchList, User user) {
+        if (!Objects.equals(watchList.getCreatorId(), user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not the owner of the watchlist");
+        }
+    }
+
+    public WatchList createWatchList(String title, String creatorId) {
+        User creator = userRepo.findById(creatorId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         WatchList watchList = new WatchList();
         watchList.setTitle(title);
+        watchList.setCreatorId(creator.getId());
         watchList.getCollaborators().add(creator);
         return watchListRepo.save(watchList);
     }
@@ -52,42 +60,47 @@ public class WatchListService {
         return watchListRepo.findById(id);
     }
 
-    public Optional<WatchList> updateWatchListTitle(String id, String newTitle) {
+    public Optional<WatchList> updateWatchListTitle(String id, String newTitle, User user) {
         return watchListRepo.findById(id).map(wl -> {
+            verifyOwnership(wl, user);
             wl.setTitle(newTitle);
             return watchListRepo.save(wl);
         });
     }
 
-    public boolean deleteWatchList(String id) {
+    public boolean deleteWatchList(String id, User user) {
         return watchListRepo.findById(id).map(wl -> {
+            verifyOwnership(wl, user);
             watchListRepo.delete(wl);
             return true;
         }).orElse(false);
     }
 
     @Transactional
-    public void addCollaborator(String watchListId, String userId) {
+    public void addCollaborator(String watchListId, String userId, User authenticatedUser) {
         WatchList wl = watchListRepo.findById(watchListId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "WatchList not found"));
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        wl.getCollaborators().add(user);
+        verifyOwnership(wl, authenticatedUser);
+        User userToAdd = userRepo.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User to add not found"));
+        wl.getCollaborators().add(userToAdd);
         watchListRepo.save(wl);
     }
 
     @Transactional
-    public void removeCollaborator(String watchListId, String userId) {
+    public void removeCollaborator(String watchListId, String userId, User authenticatedUser) {
         WatchList wl = watchListRepo.findById(watchListId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "WatchList not found"));
+        verifyOwnership(wl, authenticatedUser);
         wl.getCollaborators().removeIf(u -> u.getId().equals(userId));
         watchListRepo.save(wl);
     }
 
     @Transactional
-    public void addMovieToWatchList(String watchListId, Movie movie) {
+    public void addMovieToWatchList(String watchListId, Movie movie, User user) {
         WatchList wl = watchListRepo.findById(watchListId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "WatchList not found"));
+        verifyOwnership(wl, user);
         Movie savedMovie = movieRepo.findById(String.valueOf(movie.getId()))
                 .orElseGet(() -> movieRepo.save(movie));
         wl.getFavoriteMovies().add(savedMovie);
@@ -95,17 +108,19 @@ public class WatchListService {
     }
 
     @Transactional
-    public void removeMovieFromWatchList(String watchListId, Long movieId) {
+    public void removeMovieFromWatchList(String watchListId, Long movieId, User user) {
         WatchList wl = watchListRepo.findById(watchListId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "WatchList not found"));
+        verifyOwnership(wl, user);
         wl.getFavoriteMovies().removeIf(m -> m.getId().equals(movieId));
         watchListRepo.save(wl);
     }
 
     @Transactional
-    public void addSeriesToWatchList(String watchListId, Series series) {
+    public void addSeriesToWatchList(String watchListId, Series series, User user) {
         WatchList wl = watchListRepo.findById(watchListId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "WatchList not found"));
+        verifyOwnership(wl, user);
         Series savedSeries = seriesRepo.findById(String.valueOf(series.getId()))
                 .orElseGet(() -> seriesRepo.save(series));
         wl.getFavoriteSeries().add(savedSeries);
@@ -113,9 +128,10 @@ public class WatchListService {
     }
 
     @Transactional
-    public void removeSeriesFromWatchList(String watchListId, Long seriesId) {
+    public void removeSeriesFromWatchList(String watchListId, Long seriesId, User user) {
         WatchList wl = watchListRepo.findById(watchListId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "WatchList not found"));
+        verifyOwnership(wl, user);
         wl.getFavoriteSeries().removeIf(s -> s.getId().equals(seriesId));
         watchListRepo.save(wl);
     }

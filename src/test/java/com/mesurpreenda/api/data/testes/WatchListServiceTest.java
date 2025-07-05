@@ -62,6 +62,8 @@ class WatchListServiceTest {
         existingWatchList = new WatchList();
         existingWatchList.setId("wl-abc");
         existingWatchList.setTitle("MinhaLista");
+        existingWatchList.setCreatorId(existingUser.getId()); // Definir usuário como criador/proprietário
+        existingWatchList.getCollaborators().add(existingUser); // Adicionar usuário como colaborador
 
         sampleMovie = new Movie();
         sampleMovie.setId(Long.valueOf("550"));
@@ -158,7 +160,7 @@ class WatchListServiceTest {
             when(watchListRepo.save(any(WatchList.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
 
-            Optional<WatchList> maybe = service.updateWatchListTitle("wl-abc", "NovoTítulo");
+            Optional<WatchList> maybe = service.updateWatchListTitle("wl-abc", "NovoTítulo", existingUser);
             assertThat(maybe).isPresent();
             assertThat(maybe.get().getTitle()).isEqualTo("NovoTítulo");
 
@@ -172,7 +174,7 @@ class WatchListServiceTest {
         void updateWatchListTitle_notFound() {
             when(watchListRepo.findById("nope")).thenReturn(Optional.empty());
 
-            Optional<WatchList> maybe = service.updateWatchListTitle("nope", "Qualquer");
+            Optional<WatchList> maybe = service.updateWatchListTitle("nope", "Qualquer", existingUser);
             assertThat(maybe).isEmpty();
 
             verify(watchListRepo, never()).save(any());
@@ -183,7 +185,7 @@ class WatchListServiceTest {
         void deleteWatchList_success() {
             when(watchListRepo.findById("wl-abc")).thenReturn(Optional.of(existingWatchList));
 
-            boolean result = service.deleteWatchList("wl-abc");
+            boolean result = service.deleteWatchList("wl-abc", existingUser);
             assertThat(result).isTrue();
 
             verify(watchListRepo, times(1)).delete(existingWatchList);
@@ -194,7 +196,7 @@ class WatchListServiceTest {
         void deleteWatchList_notFound() {
             when(watchListRepo.findById("nope")).thenReturn(Optional.empty());
 
-            boolean result = service.deleteWatchList("nope");
+            boolean result = service.deleteWatchList("nope", existingUser);
             assertThat(result).isFalse();
 
             verify(watchListRepo, never()).delete(any());
@@ -213,7 +215,7 @@ class WatchListServiceTest {
             when(userRepo.findById("user-456"))
                     .thenReturn(Optional.of(new User())); // usuário fictício
 
-            service.addCollaborator("wl-abc", "user-456");
+            service.addCollaborator("wl-abc", "user-456", existingUser);
 
             // Ao final, a lista de colaboradores deve conter o novo usuário
             assertThat(existingWatchList.getCollaborators()).hasSize(1);
@@ -226,7 +228,7 @@ class WatchListServiceTest {
         void addCollaborator_watchListNotFound() {
             when(watchListRepo.findById("none")).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> service.addCollaborator("none", "user-456"))
+            assertThatThrownBy(() -> service.addCollaborator("none", "user-456", existingUser))
                     .isInstanceOf(ResponseStatusException.class)
                     .hasMessageContaining("WatchList not found");
 
@@ -239,9 +241,9 @@ class WatchListServiceTest {
             when(watchListRepo.findById("wl-abc")).thenReturn(Optional.of(existingWatchList));
             when(userRepo.findById("missing")).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> service.addCollaborator("wl-abc", "missing"))
+            assertThatThrownBy(() -> service.addCollaborator("wl-abc", "missing", existingUser))
                     .isInstanceOf(ResponseStatusException.class)
-                    .hasMessageContaining("User not found");
+                    .hasMessageContaining("User to add not found");
 
             verify(watchListRepo, never()).save(any());
         }
@@ -249,16 +251,21 @@ class WatchListServiceTest {
         @Test
         @DisplayName("Deve remover colaborador existente")
         void removeCollaborator_success() {
-            // Preenche colaborador na watchlist
+            // Limpa a lista e adiciona apenas o colaborador que será removido
+            existingWatchList.getCollaborators().clear();
+            existingWatchList.getCollaborators().add(existingUser); // Adiciona o proprietário
+            
             User colaborador = new User();
             colaborador.setId("user-789");
             existingWatchList.getCollaborators().add(colaborador);
 
             when(watchListRepo.findById("wl-abc")).thenReturn(Optional.of(existingWatchList));
 
-            service.removeCollaborator("wl-abc", "user-789");
+            service.removeCollaborator("wl-abc", "user-789", existingUser);
 
-            assertThat(existingWatchList.getCollaborators()).isEmpty();
+            // Deve conter apenas o proprietário
+            assertThat(existingWatchList.getCollaborators()).hasSize(1);
+            assertThat(existingWatchList.getCollaborators()).contains(existingUser);
             verify(watchListRepo).save(existingWatchList);
         }
 
@@ -267,7 +274,7 @@ class WatchListServiceTest {
         void removeCollaborator_watchListNotFound() {
             when(watchListRepo.findById("none")).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> service.removeCollaborator("none", "u1"))
+            assertThatThrownBy(() -> service.removeCollaborator("none", "u1", existingUser))
                     .isInstanceOf(ResponseStatusException.class)
                     .hasMessageContaining("WatchList not found");
 
@@ -286,7 +293,7 @@ class WatchListServiceTest {
             when(watchListRepo.findById("wl-abc")).thenReturn(Optional.of(existingWatchList));
             when(movieRepo.findById("550")).thenReturn(Optional.of(sampleMovie));
 
-            service.addMovieToWatchList("wl-abc", sampleMovie);
+            service.addMovieToWatchList("wl-abc", sampleMovie, existingUser);
 
             assertThat(existingWatchList.getFavoriteMovies()).contains(sampleMovie);
             verify(watchListRepo).save(existingWatchList);
@@ -305,7 +312,7 @@ class WatchListServiceTest {
             when(movieRepo.findById("999")).thenReturn(Optional.empty());
             when(movieRepo.save(newMovie)).thenReturn(newMovie);
 
-            service.addMovieToWatchList("wl-abc", newMovie);
+            service.addMovieToWatchList("wl-abc", newMovie, existingUser);
 
             assertThat(existingWatchList.getFavoriteMovies()).contains(newMovie);
             verify(movieRepo).save(newMovie);
@@ -317,7 +324,7 @@ class WatchListServiceTest {
         void addMovieToWatchList_watchListNotFound() {
             when(watchListRepo.findById("none")).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> service.addMovieToWatchList("none", sampleMovie))
+            assertThatThrownBy(() -> service.addMovieToWatchList("none", sampleMovie, existingUser))
                     .isInstanceOf(ResponseStatusException.class)
                     .hasMessageContaining("WatchList not found");
 
@@ -331,7 +338,7 @@ class WatchListServiceTest {
             existingWatchList.getFavoriteMovies().add(sampleMovie);
             when(watchListRepo.findById("wl-abc")).thenReturn(Optional.of(existingWatchList));
 
-            service.removeMovieFromWatchList("wl-abc", Long.valueOf(sampleMovie.getId()));
+            service.removeMovieFromWatchList("wl-abc", Long.valueOf(sampleMovie.getId()), existingUser);
 
             assertThat(existingWatchList.getFavoriteMovies()).doesNotContain(sampleMovie);
             verify(watchListRepo).save(existingWatchList);
@@ -342,7 +349,7 @@ class WatchListServiceTest {
         void removeMovieFromWatchList_watchListNotFound() {
             when(watchListRepo.findById("none")).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> service.removeMovieFromWatchList("none", 550L))
+            assertThatThrownBy(() -> service.removeMovieFromWatchList("none", 550L, existingUser))
                     .isInstanceOf(ResponseStatusException.class)
                     .hasMessageContaining("WatchList not found");
 
@@ -356,7 +363,7 @@ class WatchListServiceTest {
             when(watchListRepo.findById("wl-abc")).thenReturn(Optional.of(existingWatchList));
             when(seriesRepo.findById("1")).thenReturn(Optional.of(sampleSeries));
 
-            service.addSeriesToWatchList("wl-abc", sampleSeries);
+            service.addSeriesToWatchList("wl-abc", sampleSeries, existingUser);
 
             assertThat(existingWatchList.getFavoriteSeries()).contains(sampleSeries);
             verify(watchListRepo).save(existingWatchList);
@@ -375,7 +382,7 @@ class WatchListServiceTest {
             when(seriesRepo.findById("888")).thenReturn(Optional.empty());
             when(seriesRepo.save(newSeries)).thenReturn(newSeries);
 
-            service.addSeriesToWatchList("wl-abc", newSeries);
+            service.addSeriesToWatchList("wl-abc", newSeries, existingUser);
 
             assertThat(existingWatchList.getFavoriteSeries()).contains(newSeries);
             verify(seriesRepo).save(newSeries);
@@ -387,7 +394,7 @@ class WatchListServiceTest {
         void addSeriesToWatchList_watchListNotFound() {
             when(watchListRepo.findById("none")).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> service.addSeriesToWatchList("none", sampleSeries))
+            assertThatThrownBy(() -> service.addSeriesToWatchList("none", sampleSeries, existingUser))
                     .isInstanceOf(ResponseStatusException.class)
                     .hasMessageContaining("WatchList not found");
 
@@ -401,7 +408,7 @@ class WatchListServiceTest {
             existingWatchList.getFavoriteSeries().add(sampleSeries);
             when(watchListRepo.findById("wl-abc")).thenReturn(Optional.of(existingWatchList));
 
-            service.removeSeriesFromWatchList("wl-abc", sampleSeries.getId());
+            service.removeSeriesFromWatchList("wl-abc", sampleSeries.getId(), existingUser);
 
             assertThat(existingWatchList.getFavoriteSeries()).doesNotContain(sampleSeries);
             verify(watchListRepo).save(existingWatchList);
@@ -412,7 +419,7 @@ class WatchListServiceTest {
         void removeSeriesFromWatchList_watchListNotFound() {
             when(watchListRepo.findById("none")).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> service.removeSeriesFromWatchList("none", 100L))
+            assertThatThrownBy(() -> service.removeSeriesFromWatchList("none", 100L, existingUser))
                     .isInstanceOf(ResponseStatusException.class)
                     .hasMessageContaining("WatchList not found");
 

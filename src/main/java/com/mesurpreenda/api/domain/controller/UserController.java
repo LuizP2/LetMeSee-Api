@@ -3,12 +3,9 @@ package com.mesurpreenda.api.domain.controller;
 import com.mesurpreenda.api.data.entity.User;
 import com.mesurpreenda.api.data.service.ApiServices;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -17,36 +14,22 @@ public class UserController {
     @Autowired
     private ApiServices userService;
 
-    @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    @GetMapping("/me")
+    public ResponseEntity<User> getMyData(@AuthenticationPrincipal User user) {
+        // O objeto 'user' já vem do contexto de segurança, então é seguro retorná-lo.
+        return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable String id) {
-        return userService.getUserById(id)
+    @PutMapping("/me")
+    public ResponseEntity<User> updateMyData(@AuthenticationPrincipal User authenticatedUser, @RequestBody User userDetails) {
+        return userService.updateUser(authenticatedUser.getId(), userDetails)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@RequestBody User user) {
-        User createdUser = userService.createUser(user);
-        URI location = URI.create("/api/users/" + createdUser.getId());
-        return ResponseEntity.created(location).body(createdUser).getBody();
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody User userDetails) {
-        return userService.updateUser(id, userDetails)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
-        boolean deleted = userService.deleteUser(id);
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteMyAccount(@AuthenticationPrincipal User user) {
+        boolean deleted = userService.deleteUser(user.getId());
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 }

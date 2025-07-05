@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,23 +24,16 @@ public class ApiServices {
     @Autowired
     private SeriesRepository seriesRepo;
 
-    public List<User> getAllUsers() {
-        return userRepo.findAll();
-    }
-
     public Optional<User> getUserById(String id) {
         return userRepo.findById(id);
-    }
-
-    public User createUser(User user) {
-        return userRepo.save(user);
     }
 
     public Optional<User> updateUser(String id, User userDetails) {
         return userRepo.findById(id).map(user -> {
             user.setName(userDetails.getName());
             user.setEmail(userDetails.getEmail());
-            user.setPassword(userDetails.getPassword());
+            // A senha deve ser atualizada em um fluxo separado e seguro
+            // user.setPassword(userDetails.getPassword()); 
             return userRepo.save(user);
         });
     }
@@ -66,27 +58,34 @@ public class ApiServices {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        Movie savedMovie = movieRepo.save(movie);
+        Movie movieToAdd = movieRepo.findById(String.valueOf(movie.getId()))
+                .orElseGet(() -> movieRepo.save(movie));
 
-        user.getFavoriteMovies().add(savedMovie);
-
-        userRepo.save(user);
+        if (!user.getFavoriteMovies().contains(movieToAdd)) {
+            user.getFavoriteMovies().add(movieToAdd);
+            userRepo.save(user);
+        }
     }
 
     @Transactional
-    public void addSeriesToFavorites(String userId, Series serie) {
+    public void addSeriesToFavorites(String userId, Series series) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        Series savedSeries = seriesRepo.save(serie);
+        Series seriesToAdd = seriesRepo.findById(String.valueOf(series.getId()))
+                .orElseGet(() -> seriesRepo.save(series));
 
-        user.getFavoriteSeries().add(savedSeries);
-
-        userRepo.save(user);
+        if (!user.getFavoriteSeries().contains(seriesToAdd)) {
+            user.getFavoriteSeries().add(seriesToAdd);
+            userRepo.save(user);
+        }
     }
 
+    @Transactional
     public void removeFavorite(String userId, Long contentId, boolean isMovie) {
-        User user = userRepo.findById(userId).orElseThrow();
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
         if (isMovie) {
             user.getFavoriteMovies().removeIf(m -> m.getId().equals(contentId));
         } else {
